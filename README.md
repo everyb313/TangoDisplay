@@ -37,7 +37,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v1.0.zip`
+2. Download `TangoDisplay-v1.0.1.zip`
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -119,6 +119,16 @@ Key design decisions:
 - Profiles are stored as JSON in `~/Library/Application Support/TangoDisplay/profiles/`
 - Colors are stored as hex strings in `AppearanceProfile` (Codable)
 - `ObservableObject` + `@Published` throughout (macOS 13 target predates `@Observable`)
+
+---
+
+## Changelog
+
+### v1.0.1
+- **Bug fix:** Clearing an override no longer inherits a user-pause that was active before the override was triggered. `isPausedByUser` and `pendingStateBeforePause` are now reset in `clearOverride()`.
+
+### v1.0
+- Initial release.
 
 ---
 
