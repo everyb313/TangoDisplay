@@ -10,8 +10,9 @@ struct StatusPane: View {
         VStack(alignment: .leading, spacing: 12) {
 
             // Status row
-            HStack(spacing: 16) {
-                modeBadge
+            HStack(spacing: 8) {
+                playerBadge
+                displayBadge
                 watchdogIndicator
                 Spacer()
             }
@@ -24,11 +25,11 @@ struct StatusPane: View {
                 Button("Override… (⌘⇧O)") { showingOverride = true }
                     .buttonStyle(.bordered)
 
-                Button(appState.displayState.mode == .paused ? "Unpause (⌘⇧P)" : "Pause Display (⌘⇧P)") {
+                Button(appState.isDisplayPausedByUser ? "Unpause Display (⌘⇧P)" : "Pause Display (⌘⇧P)") {
                     appState.togglePaused()
                 }
                 .buttonStyle(.bordered)
-                .tint(appState.displayState.mode == .paused ? .orange : nil)
+                .tint(appState.isDisplayPausedByUser ? .orange : nil)
             }
 
             Divider()
@@ -67,17 +68,39 @@ struct StatusPane: View {
         .padding()
     }
 
-    private var modeBadge: some View {
+    private var playerBadge: some View {
+        let color: Color = switch appState.currentPlayerState {
+        case .playing: .green
+        case .paused:  .orange
+        case .stopped: .gray
+        }
+        let label: String = switch appState.currentPlayerState {
+        case .playing: "Playing"
+        case .paused:  "Player Paused"
+        case .stopped: "Idle"
+        }
+        return badge(label: label, color: color)
+    }
+
+    private var displayBadge: some View {
+        let paused = appState.isDisplayPausedByUser
+        let mode   = appState.displayState.mode
+        let color: Color = paused ? .orange : (mode == .cortina ? .blue : mode == .override ? .purple : .green)
+        let label: String = paused ? "Display Paused" : (mode == .cortina ? "Cortina" : mode == .override ? "Override" : "Display Live")
+        return badge(label: label, color: color)
+    }
+
+    private func badge(label: String, color: Color) -> some View {
         HStack(spacing: 6) {
             Circle()
-                .fill(modeColor)
+                .fill(color)
                 .frame(width: 10, height: 10)
-            Text(modeLabel)
+            Text(label)
                 .font(.system(size: 13, weight: .semibold))
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
-        .background(modeColor.opacity(0.12))
+        .background(color.opacity(0.12))
         .clipShape(Capsule())
     }
 
@@ -91,26 +114,6 @@ struct StatusPane: View {
                 : (appState.settings.selectedPlayer == .swinsian ? "Listening" : "Polling OK"))
                 .font(.system(size: 12))
                 .foregroundColor(appState.watchdogActive ? .orange : .secondary)
-        }
-    }
-
-    private var modeColor: Color {
-        switch appState.displayState.mode {
-        case .playing:  return .green
-        case .cortina:  return .blue
-        case .idle:     return .gray
-        case .paused:   return .orange
-        case .override: return .purple
-        }
-    }
-
-    private var modeLabel: String {
-        switch appState.displayState.mode {
-        case .playing:  return "Playing"
-        case .cortina:  return "Cortina"
-        case .idle:     return "Idle"
-        case .paused:   return "Paused"
-        case .override: return "Override"
         }
     }
 

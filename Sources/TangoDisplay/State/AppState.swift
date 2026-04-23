@@ -36,9 +36,10 @@ final class AppState: ObservableObject {
     private var playlistTracks: [Track]? = nil       // last known playlist; nil = unavailable
     private var playlistCurrentIndex: Int = 0        // 0-based
     private var lastSeenPersistentID: String = ""
-    private var lastSeenPlayerState: PlayerState = .stopped
+    @Published private(set) var currentPlayerState: PlayerState = .stopped
     private var isPausedByUser = false               // ⌘⇧P toggle
     private var pendingStateBeforePause: DisplayState? = nil  // state snapshot for unpausing
+    var isDisplayPausedByUser: Bool { isPausedByUser }
 
     // MARK: - Init
 
@@ -116,7 +117,7 @@ final class AppState: ObservableObject {
         playlistTracks = nil
         playlistCurrentIndex = 0
         lastSeenPersistentID = ""
-        lastSeenPlayerState = .stopped
+        currentPlayerState = .stopped
         isPausedByUser = false
         pendingStateBeforePause = nil
         watchdogActive = false
@@ -128,14 +129,16 @@ final class AppState: ObservableObject {
     private func handleTrackUpdate(track: Track?, playerState: PlayerState) {
         // Skip duplicate polls
         let pid = track?.persistentID ?? ""
-        guard pid != lastSeenPersistentID || playerState != lastSeenPlayerState else { return }
+        guard pid != lastSeenPersistentID || playerState != currentPlayerState else { return }
         lastSeenPersistentID = pid
-        lastSeenPlayerState = playerState
+        currentPlayerState = playerState
 
         // Stopped
         if playerState == .stopped || track == nil {
             trackHistory.removeAll()
             displayState = DisplayState()   // mode = .idle
+            isPausedByUser = false
+            pendingStateBeforePause = nil
             return
         }
 
@@ -311,7 +314,7 @@ final class AppState: ObservableObject {
         isPausedByUser = false          // don't inherit a pre-override user-pause
         pendingStateBeforePause = nil
         lastSeenPersistentID = ""       // force re-evaluation on next poll
-        lastSeenPlayerState = .stopped
+        currentPlayerState = .stopped
     }
 
     // MARK: - Pause toggle (⌘⇧P)
@@ -319,13 +322,15 @@ final class AppState: ObservableObject {
     func togglePaused() {
         if isPausedByUser {
             isPausedByUser = false
-            // Restore the pre-pause display state (poll will update it shortly anyway)
-            if let pending = pendingStateBeforePause {
-                displayState = pending
-            } else {
-                displayState.mode = .idle
-            }
             pendingStateBeforePause = nil
+            // Reset the dedup guard so the next poll re-evaluates current player state.
+            // Restoring the pre-pause snapshot is unsafe — the player state may have changed
+            // while the display was frozen, so currentPlayerState is already stale and the
+            // guard would permanently skip the correction poll.
+            lastSeenPersistentID = ""
+            currentPlayerState = .stopped
+            displayState = DisplayState()   // idle until the poll arrives
+            pollNow()                       // trigger immediately rather than waiting up to 2s
         } else {
             isPausedByUser = true
             pendingStateBeforePause = displayState
