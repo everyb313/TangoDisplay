@@ -23,6 +23,27 @@ struct PresentationView: View {
         // Content layer: transitions between playing/idle/cortina views.
         // Background is applied behind it; track counter is overlaid on top.
         ZStack {
+            // Album artwork layer — above background, below text.
+            // Uses displayedArtworkTrackID as transition identity so it
+            // transitions in/out with each track change (same timing as text).
+            if activeProfile.showAlbumArtwork {
+                TransitionContainer(
+                    identity: appState.displayedArtworkTrackID,
+                    style: activeProfile.transitionStyle,
+                    duration: activeProfile.transitionDuration
+                ) {
+                    if let art = appState.currentArtwork {
+                        Image(nsImage: art)
+                            .resizable()
+                            .scaledToFit()
+                            .scaleEffect(activeProfile.albumArtworkScale)
+                            .offset(x: activeProfile.albumArtworkOffsetX,
+                                    y: activeProfile.albumArtworkOffsetY)
+                            .opacity(activeProfile.albumArtworkOpacity)
+                    }
+                }
+            }
+
             TransitionContainer(
                 identity: appState.displayState,
                 style: activeProfile.transitionStyle,
@@ -61,10 +82,11 @@ struct PresentationView: View {
         .overlay(alignment: .bottomTrailing) {
             // Track counter — in an overlay so it is always in front by
             // SwiftUI's layout contract, regardless of background image
-            // rendering. Toggle takes effect instantly; shown for both
-            // .playing and .paused so it persists when Music.app pauses.
+            // rendering. Toggle takes effect instantly; shown only when .playing
+            // and the active source supports playlist enumeration.
             if settings.showTrackCounter,
-               (appState.displayState.mode == .playing || appState.displayState.mode == .paused),
+               appState.activeSourceSupportsPlaylist,
+               appState.displayState.mode == .playing,
                let pos = appState.displayState.tandaPosition {
                 Text(tandaLabel(pos))
                     .font(.system(size: 28, weight: .light))

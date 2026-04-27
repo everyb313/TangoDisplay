@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import TangoDisplayCore
 
@@ -67,8 +68,23 @@ final class AppleScriptBridge {
         end tell
         """
 
+    /// Returns raw image bytes of the current track's first artwork, or "" when none.
+    private static let artworkScriptSource = """
+        tell application "Music"
+            try
+                if player state is not stopped then
+                    if (count artworks of current track) > 0 then
+                        return raw data of artwork 1 of current track
+                    end if
+                end if
+            end try
+            return ""
+        end tell
+        """
+
     private var trackScript: NSAppleScript?
     private var playlistScript: NSAppleScript?
+    private var artworkScript: NSAppleScript?
 
     // MARK: - Lifecycle
 
@@ -85,6 +101,10 @@ final class AppleScriptBridge {
             self.playlistScript = NSAppleScript(source: Self.playlistScriptSource)
             self.playlistScript?.compileAndReturnError(&err)
             if let err { NSLog("TangoDisplay: playlistScript compile error: %@", err) }
+
+            self.artworkScript = NSAppleScript(source: Self.artworkScriptSource)
+            self.artworkScript?.compileAndReturnError(&err)
+            if let err { NSLog("TangoDisplay: artworkScript compile error: %@", err) }
         }
     }
 
@@ -142,6 +162,30 @@ final class AppleScriptBridge {
 
             let result = Self.parsePlaylistDescriptor(descriptor)
             completion(.success(result))
+        }
+    }
+
+    // MARK: - Fetch album artwork
+
+    /// Returns the artwork image for the current track, or nil when unavailable.
+    /// Must NOT be called from the main thread — dispatches on `queue` internally.
+    func fetchCurrentArtwork(completion: @escaping (NSImage?) -> Void) {
+        queue.async { [weak self] in
+            guard let self, let script = self.artworkScript else {
+                completion(nil)
+                return
+            }
+            var errorInfo: NSDictionary?
+            let descriptor = script.executeAndReturnError(&errorInfo)
+            if let errorInfo {
+                NSLog("TangoDisplay: artwork fetch error: %@", errorInfo)
+                completion(nil)
+                return
+            }
+            // descriptor.data returns raw bytes when artwork is present, or an
+            // empty/string-encoded value when the script returns "". NSImage(data:)
+            // returns nil for non-image bytes, so we rely on that to filter.
+            completion(NSImage(data: descriptor.data))
         }
     }
 

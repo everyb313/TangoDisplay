@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import TangoDisplayCore
 
@@ -30,8 +31,18 @@ protocol MusicPlayerSource: AnyObject {
     /// Fired before onTrackUpdate each poll so callers can use it during cortina transitions.
     var onNextTrackUpdate: ((Track?) -> Void)? { get set }
     var onWatchdogChanged: ((Bool) -> Void)? { get set }
+    /// Whether the source can enumerate the playlist. False means tandaPosition.total
+    /// is always nil and the track counter is not useful.
+    var supportsPlaylist: Bool { get }
     func start()
     func stop()
     func pollNow()
     func triggerPlaylistFetch()
+    /// Fetches album artwork for the given track. Returns nil when unavailable.
+    func fetchArtwork(for track: Track) async -> NSImage?
+}
+
+extension MusicPlayerSource {
+    var supportsPlaylist: Bool { true }
+    func fetchArtwork(for track: Track) async -> NSImage? { nil }
 }

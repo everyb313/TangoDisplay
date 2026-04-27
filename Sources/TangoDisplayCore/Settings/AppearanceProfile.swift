@@ -40,6 +40,13 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
     public var backgroundImageOffsetX: Double    // points, horizontal pan
     public var backgroundImageOffsetY: Double    // points, vertical pan
 
+    // Album artwork overlay (shown above background, below text; hidden during cortinas)
+    public var showAlbumArtwork: Bool
+    public var albumArtworkOpacity: Double   // 0.0–1.0
+    public var albumArtworkScale: Double     // multiplier, 1.0 = natural size scaled to fit
+    public var albumArtworkOffsetX: Double   // points, horizontal pan
+    public var albumArtworkOffsetY: Double   // points, vertical pan
+
     public init(id: UUID, name: String, isBuiltIn: Bool,
                 titleFontName: String = "System", titleFontSize: Double = 72,
                 titleFontBold: Bool = true, titleFontItalic: Bool = false,
@@ -62,7 +69,12 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
                 backgroundImageOpacity: Double = 1.0,
                 backgroundImageScale: Double = 1.0,
                 backgroundImageOffsetX: Double = 0.0,
-                backgroundImageOffsetY: Double = 0.0) {
+                backgroundImageOffsetY: Double = 0.0,
+                showAlbumArtwork: Bool = false,
+                albumArtworkOpacity: Double = 1.0,
+                albumArtworkScale: Double = 1.0,
+                albumArtworkOffsetX: Double = 0.0,
+                albumArtworkOffsetY: Double = 0.0) {
         self.id = id
         self.name = name
         self.isBuiltIn = isBuiltIn
@@ -96,6 +108,11 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
         self.backgroundImageScale = backgroundImageScale
         self.backgroundImageOffsetX = backgroundImageOffsetX
         self.backgroundImageOffsetY = backgroundImageOffsetY
+        self.showAlbumArtwork = showAlbumArtwork
+        self.albumArtworkOpacity = albumArtworkOpacity
+        self.albumArtworkScale = albumArtworkScale
+        self.albumArtworkOffsetX = albumArtworkOffsetX
+        self.albumArtworkOffsetY = albumArtworkOffsetY
     }
 
     // Custom decoder so existing JSON lacking the image keys still loads cleanly.
@@ -135,6 +152,11 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
         backgroundImageScale    = try c.decodeIfPresent(Double.self,  forKey: .backgroundImageScale)    ?? 1.0
         backgroundImageOffsetX  = try c.decodeIfPresent(Double.self,  forKey: .backgroundImageOffsetX)  ?? 0.0
         backgroundImageOffsetY  = try c.decodeIfPresent(Double.self,  forKey: .backgroundImageOffsetY)  ?? 0.0
+        showAlbumArtwork        = try c.decodeIfPresent(Bool.self,    forKey: .showAlbumArtwork)        ?? false
+        albumArtworkOpacity     = try c.decodeIfPresent(Double.self,  forKey: .albumArtworkOpacity)     ?? 1.0
+        albumArtworkScale       = try c.decodeIfPresent(Double.self,  forKey: .albumArtworkScale)       ?? 1.0
+        albumArtworkOffsetX     = try c.decodeIfPresent(Double.self,  forKey: .albumArtworkOffsetX)     ?? 0.0
+        albumArtworkOffsetY     = try c.decodeIfPresent(Double.self,  forKey: .albumArtworkOffsetY)     ?? 0.0
     }
 
     public static let builtIns: [AppearanceProfile] = [.classic, .modern, .highContrast]

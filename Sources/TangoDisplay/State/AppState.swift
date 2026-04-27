@@ -17,6 +17,10 @@ final class AppState: ObservableObject {
     @Published var draftProfile: AppearanceProfile? = nil
     /// Set by AppearanceSettingsView when the working copy differs from the last saved state.
     @Published var hasUnsavedAppearanceChanges: Bool = false
+    /// Album artwork for the current dance track. Nil during cortinas and idle.
+    @Published private(set) var currentArtwork: NSImage? = nil
+    /// persistentID of the track whose artwork is currently displayed; drives transition identity.
+    @Published private(set) var displayedArtworkTrackID: String? = nil
 
     // MARK: - Window actions (set by ControlView; used by MenuBarController)
 
@@ -32,6 +36,7 @@ final class AppState: ObservableObject {
 
     // MARK: - Internal state
 
+    private var artworkCache: [String: NSImage] = [:]  // keyed by persistentID
     private var trackHistory: [Track] = []           // cleared on each cortina/idle
     private var playlistTracks: [Track]? = nil       // last known playlist; nil = unavailable
     private var playlistCurrentIndex: Int = 0        // 0-based
@@ -41,6 +46,7 @@ final class AppState: ObservableObject {
     private var isPausedByUser = false               // ⌘⇧P toggle
     private var pendingStateBeforePause: DisplayState? = nil  // state snapshot for unpausing
     var isDisplayPausedByUser: Bool { isPausedByUser }
+    var activeSourceSupportsPlaylist: Bool { activeSource.supportsPlaylist }
 
     // MARK: - Init
 
@@ -135,6 +141,9 @@ final class AppState: ObservableObject {
         watchdogActive = false
         lastKnownNextTrack = nil
         displayState = DisplayState()
+        currentArtwork = nil
+        displayedArtworkTrackID = nil
+        artworkCache.removeAll()
     }
 
     // MARK: - Track update (core state machine)
@@ -152,6 +161,8 @@ final class AppState: ObservableObject {
             displayState = DisplayState()   // mode = .idle
             isPausedByUser = false
             pendingStateBeforePause = nil
+            currentArtwork = nil
+            displayedArtworkTrackID = nil
             return
         }
 
@@ -167,7 +178,7 @@ final class AppState: ObservableObject {
             return
         }
 
-        // Player paused (not user-initiated): show track but indicate paused
+        // Player paused (not user-initiated): show track but indicate paused; clear artwork
         if playerState == .paused {
             if trackHistory.last?.persistentID != track.persistentID {
                 trackHistory.append(track)
@@ -181,6 +192,8 @@ final class AppState: ObservableObject {
                 tandaPosition: position,
                 overrideText: nil
             )
+            currentArtwork = nil
+            displayedArtworkTrackID = nil
             return
         }
 
@@ -230,6 +243,8 @@ final class AppState: ObservableObject {
             tandaPosition: nil,
             overrideText: nil
         )
+        currentArtwork = nil
+        displayedArtworkTrackID = nil
     }
 
     private func handleDanceTrack(track: Track, detector: CortinaDetector) {
@@ -247,9 +262,9 @@ final class AppState: ObservableObject {
         }
 
         // If we transitioned from .playing or .cortina and the new track isn't in the
-        // known playlist (different playlist loaded), the history-based count can't be
-        // trusted. Reset history, suppress the counter, and fetch fresh playlist data.
-        // handlePlaylistUpdate will set the correct position.
+        // known playlist (different playlist loaded), reset history and fetch fresh
+        // playlist data. Show "Track 1" immediately; handlePlaylistUpdate will update
+        // to the full "X of Y" position when the fetch completes.
         let trackInPlaylist = playlistTracks?.contains(where: { $0.persistentID == track.persistentID }) ?? false
         if (comingFromPlaying || comingFromCortina) && !trackInPlaylist {
             trackHistory = [track]
@@ -258,9 +273,10 @@ final class AppState: ObservableObject {
                 mode: .playing,
                 currentTrack: track,
                 nextTrack: nil,
-                tandaPosition: nil,
+                tandaPosition: TandaPosition(current: 1, total: nil),
                 overrideText: nil
             )
+            fetchArtworkIfNeeded(for: track)
             return
         }
 
@@ -274,6 +290,7 @@ final class AppState: ObservableObject {
             tandaPosition: position,
             overrideText: nil
         )
+        fetchArtworkIfNeeded(for: track)
     }
 
     private func updateTandaPositionQuietly(track: Track) {
@@ -322,6 +339,8 @@ final class AppState: ObservableObject {
     func activateOverride(text: String) {
         displayState.overrideText = text
         displayState.mode = .override
+        currentArtwork = nil
+        displayedArtworkTrackID = nil
     }
 
     func clearOverride() {
@@ -351,6 +370,8 @@ final class AppState: ObservableObject {
             isPausedByUser = true
             pendingStateBeforePause = displayState
             displayState.mode = .paused
+            currentArtwork = nil
+            displayedArtworkTrackID = nil
         }
     }
 
@@ -387,6 +408,27 @@ final class AppState: ObservableObject {
         debugLog.append("[\(ts)] \(message)")
         if debugLog.count > 200 {
             debugLog.removeFirst(debugLog.count - 200)
+        }
+    }
+
+    // MARK: - Artwork
+
+    private func fetchArtworkIfNeeded(for track: Track) {
+        let pid = track.persistentID
+        displayedArtworkTrackID = pid
+        if let cached = artworkCache[pid] {
+            currentArtwork = cached
+            return
+        }
+        currentArtwork = nil
+        let source = activeSource
+        Task { [weak self] in
+            let img = await source.fetchArtwork(for: track)
+            guard let self, self.displayedArtworkTrackID == pid else { return }
+            if let img {
+                self.artworkCache[pid] = img
+                self.currentArtwork = img
+            }
         }
     }
 

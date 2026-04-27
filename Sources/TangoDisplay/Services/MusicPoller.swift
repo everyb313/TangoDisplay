@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import TangoDisplayCore
 
@@ -162,4 +163,12 @@ final class MusicPoller {
     }
 }
 
-extension MusicPoller: MusicPlayerSource {}
+extension MusicPoller: MusicPlayerSource {
+    func fetchArtwork(for track: Track) async -> NSImage? {
+        await withCheckedContinuation { continuation in
+            bridge.fetchCurrentArtwork { image in
+                continuation.resume(returning: image)
+            }
+        }
+    }
+}

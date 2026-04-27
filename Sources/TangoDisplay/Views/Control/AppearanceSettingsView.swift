@@ -53,6 +53,44 @@ struct AppearanceSettingsView: View {
             }
 
             Section {
+                Toggle("Display album artwork where available", isOn: $working.showAlbumArtwork)
+
+                if working.showAlbumArtwork {
+                    HStack {
+                        Text("Opacity")
+                        Slider(value: $working.albumArtworkOpacity, in: 0...1)
+                        Text(String(format: "%.0f%%", working.albumArtworkOpacity * 100))
+                            .monospacedDigit()
+                            .frame(width: 36)
+                    }
+                    HStack {
+                        Text("Scale")
+                        Slider(value: $working.albumArtworkScale, in: 0.1...5.0)
+                        Text(String(format: "%.2f×", working.albumArtworkScale))
+                            .monospacedDigit()
+                            .frame(width: 44)
+                    }
+                    HStack {
+                        Text("Horizontal")
+                        Slider(value: $working.albumArtworkOffsetX, in: -2000...2000)
+                        Text(String(format: "%+.0f", working.albumArtworkOffsetX))
+                            .monospacedDigit()
+                            .frame(width: 48)
+                    }
+                    HStack {
+                        Text("Vertical")
+                        Slider(value: $working.albumArtworkOffsetY, in: -2000...2000)
+                        Text(String(format: "%+.0f", working.albumArtworkOffsetY))
+                            .monospacedDigit()
+                            .frame(width: 48)
+                    }
+                }
+            } header: {
+                Text("Album Artwork")
+                    .foregroundColor(ControlTheme.accent)
+            }
+
+            Section {
                 HStack(spacing: 12) {
                     // Thumbnail or placeholder
                     Group {

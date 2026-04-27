@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import TangoDisplayCore
 
@@ -23,6 +24,33 @@ final class SwinsianMonitor {
     var onWatchdogChanged: ((Bool) -> Void)?
 
     private var observers: [AnyObject] = []
+
+    // MARK: - Artwork (file path via osascript + AVFoundation)
+
+    private static let artworkPathScript = """
+        tell application "Swinsian"
+            try
+                if player state is not stopped then
+                    return location of current track
+                end if
+            end try
+            return ""
+        end tell
+        """
+
+    private func runOsascript(_ script: String) -> String? {
+        let proc = Process()
+        proc.executableURL = URL(fileURLWithPath: "/usr/bin/osascript")
+        proc.arguments = ["-e", script]
+        let pipe = Pipe()
+        proc.standardOutput = pipe
+        proc.standardError = Pipe()
+        do { try proc.run() } catch { return nil }
+        proc.waitUntilExit()
+        guard proc.terminationStatus == 0 else { return nil }
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        return String(data: data, encoding: .utf8)
+    }
 
     // MARK: - Lifecycle
 
@@ -102,6 +130,17 @@ final class SwinsianMonitor {
 // MARK: - MusicPlayerSource conformance
 
 extension SwinsianMonitor: MusicPlayerSource {
+    var supportsPlaylist: Bool { false }
     func pollNow()              {}  // push model: no polling
     func triggerPlaylistFetch() {}  // no Swinsian playlist API
+
+    func fetchArtwork(for track: Track) async -> NSImage? {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.global(qos: .utility).async { [weak self] in
+                guard let self else { continuation.resume(returning: nil); return }
+                let path = self.runOsascript(Self.artworkPathScript) ?? ""
+                continuation.resume(returning: artworkFromAudioFile(path))
+            }
+        }
+    }
 }

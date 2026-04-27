@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import TangoDisplayCore
 
@@ -342,6 +343,21 @@ final class EmbracMonitor {
             currentInterval = min(currentInterval * 2, maxInterval)
         }
     }
+
+    // MARK: - Artwork fetch (file path via osascript + AVFoundation)
+
+    private static let artworkPathScript = """
+        tell application "Embrace"
+            try
+                set idx to current index
+                if idx is not 0 then
+                    set f to file of track idx
+                    tell application "Finder" to return POSIX path of f
+                end if
+            end try
+            return ""
+        end tell
+        """
 }
 
 // MARK: - MusicPlayerSource conformance
@@ -358,5 +374,15 @@ extension EmbracMonitor: MusicPlayerSource {
 
     func triggerPlaylistFetch() {
         scriptQueue.async { [weak self] in self?.doPlaylistFetch() }
+    }
+
+    func fetchArtwork(for track: Track) async -> NSImage? {
+        await withCheckedContinuation { continuation in
+            scriptQueue.async { [weak self] in
+                guard let self else { continuation.resume(returning: nil); return }
+                let path = self.runOsascript(Self.artworkPathScript) ?? ""
+                continuation.resume(returning: artworkFromAudioFile(path))
+            }
+        }
     }
 }
