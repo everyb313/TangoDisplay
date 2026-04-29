@@ -31,34 +31,48 @@ struct CortinaView: View {
                         .tracking(4)
                         .foregroundColor(profile.genreSwiftUIColor)
 
-                    if !next.genre.isEmpty {
-                        Text(next.genre)
-                            .font(profile.genreFont)
-                            .foregroundColor(profile.genreSwiftUIColor)
-                    }
-
-                    Text(next.artist)
-                        .font(profile.artistFont)
-                        .foregroundColor(profile.artistSwiftUIColor)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.5)
-                        .multilineTextAlignment(.center)
-
-                    if profile.showYear, let year = next.year {
-                        Text(String(year))
-                            .font(profile.yearFont)
-                            .foregroundColor(profile.yearSwiftUIColor)
-                            .multilineTextAlignment(.center)
-                    }
-
-                    if profile.showSingerDuringCortina,
-                       let singer = profile.singerValue(from: next), !singer.isEmpty {
-                        Text(singer)
-                            .font(profile.singerFont)
-                            .foregroundColor(profile.singerSwiftUIColor)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.5)
+                    ForEach(profile.cortinaItemOrder, id: \.self) { item in
+                        switch item {
+                        case .genre:
+                            if !next.genre.isEmpty {
+                                Text(next.genre)
+                                    .font(profile.genreFont)
+                                    .foregroundColor(profile.genreSwiftUIColor)
+                            }
+                        case .artist:
+                            Text(next.artist)
+                                .font(profile.artistFont)
+                                .foregroundColor(profile.artistSwiftUIColor)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.5)
+                                .multilineTextAlignment(.center)
+                        case .year:
+                            if profile.showYear, let year = next.year {
+                                Text(String(year))
+                                    .font(profile.yearFont)
+                                    .foregroundColor(profile.yearSwiftUIColor)
+                                    .multilineTextAlignment(.center)
+                            }
+                        case .title:
+                            if !next.title.isEmpty {
+                                Text(next.title)
+                                    .font(profile.titleFont)
+                                    .foregroundColor(profile.titleSwiftUIColor)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.5)
+                            }
+                        case .singer:
+                            if profile.showSingerDuringCortina,
+                               let singer = profile.singerValue(from: next), !singer.isEmpty {
+                                Text(singer)
+                                    .font(profile.singerFont)
+                                    .foregroundColor(profile.singerSwiftUIColor)
+                                    .multilineTextAlignment(.center)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.5)
+                            }
+                        }
                     }
                 }
                 .padding(.horizontal, 60)

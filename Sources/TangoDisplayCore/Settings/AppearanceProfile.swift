@@ -47,6 +47,10 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
     public var albumArtworkOffsetX: Double   // points, horizontal pan
     public var albumArtworkOffsetY: Double   // points, vertical pan
 
+    // Configurable vertical order of text items on the display
+    public var danceItemOrder: [DisplayTextItem]   // order for dance track display
+    public var cortinaItemOrder: [DisplayTextItem] // order for cortina "coming up" section
+
     // Singer line (displays a track metadata field below the title)
     public var showSinger: Bool
     public var singerSource: SingerSource
@@ -85,6 +89,8 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
                 albumArtworkScale: Double = 1.0,
                 albumArtworkOffsetX: Double = 0.0,
                 albumArtworkOffsetY: Double = 0.0,
+                danceItemOrder: [DisplayTextItem] = [.genre, .artist, .year, .title, .singer],
+                cortinaItemOrder: [DisplayTextItem] = [.genre, .artist, .year, .singer],
                 showSinger: Bool = false,
                 singerSource: SingerSource = .comments,
                 showSingerDuringCortina: Bool = false,
@@ -131,6 +137,8 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
         self.albumArtworkScale = albumArtworkScale
         self.albumArtworkOffsetX = albumArtworkOffsetX
         self.albumArtworkOffsetY = albumArtworkOffsetY
+        self.danceItemOrder = danceItemOrder
+        self.cortinaItemOrder = cortinaItemOrder
         self.showSinger = showSinger
         self.singerSource = singerSource
         self.showSingerDuringCortina = showSingerDuringCortina
@@ -191,6 +199,8 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
         singerFontBold          = try c.decodeIfPresent(Bool.self,    forKey: .singerFontBold)          ?? false
         singerFontItalic        = try c.decodeIfPresent(Bool.self,    forKey: .singerFontItalic)        ?? false
         singerColor             = try c.decodeIfPresent(String.self,  forKey: .singerColor)             ?? "#AAAAAA"
+        danceItemOrder   = try c.decodeIfPresent([DisplayTextItem].self, forKey: .danceItemOrder)   ?? [.genre, .artist, .year, .title, .singer]
+        cortinaItemOrder = try c.decodeIfPresent([DisplayTextItem].self, forKey: .cortinaItemOrder) ?? [.genre, .artist, .year, .singer]
     }
 
     public func singerValue(from track: Track) -> String? {
@@ -227,6 +237,20 @@ public struct AppearanceProfile: Codable, Identifiable, Equatable {
         trackCounterColor: "#B3B3B3",
         transitionStyle: .cut, transitionDuration: 0.0
     )
+}
+
+public enum DisplayTextItem: String, Codable, CaseIterable {
+    case genre, artist, year, title, singer
+
+    public var displayName: String {
+        switch self {
+        case .genre:  "Genre"
+        case .artist: "Artist"
+        case .year:   "Year"
+        case .title:  "Title"
+        case .singer: "Singer"
+        }
+    }
 }
 
 public enum SingerSource: String, Codable, CaseIterable {

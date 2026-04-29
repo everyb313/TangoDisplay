@@ -97,6 +97,25 @@ When the singer line is on, a second toggle — **Show singer during cortina** �
 
 ---
 
+## Text Order
+
+![Appearance — text order](https://raw.githubusercontent.com/richardsladetdj-creator/TangoDisplay/main/docs/screenshots/appearance-textorder-v220.png)
+
+Control the vertical order in which text items appear on the dancer display. There are two independent orderings — one for dance tracks and one for the cortina "Coming Up" preview.
+
+| Section | What it controls |
+|---|---|
+| **Dance Tracks** | Order of items on the main display while a tanda is playing |
+| **Cortinas — Coming Up** | Order of items in the next-tanda preview shown during cortinas |
+
+Each section lists the available items. Use the **↑** and **↓** chevron buttons on the right of each row to move items up or down. Changes take effect on the dancer display immediately.
+
+**Dance Tracks** items: Genre, Artist, Year, Title, Singer (default order matches the original layout)
+
+**Cortinas — Coming Up** items: Genre, Artist, Year, Singer — plus **Title** is available here too if you want to show the next track's title in the cortina preview (off by default)
+
+---
+
 ## Saving your settings
 
 - **Save** — updates the currently active profile with the new settings

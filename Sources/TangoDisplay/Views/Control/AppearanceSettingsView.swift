@@ -189,6 +189,30 @@ struct AppearanceSettingsView: View {
             }
 
             Section {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Dance Tracks")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 4)
+                    orderRows(items: $working.danceItemOrder)
+                }
+
+                Divider()
+                    .padding(.vertical, 4)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Cortinas — Coming Up")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 4)
+                    orderRows(items: $working.cortinaItemOrder)
+                }
+            } header: {
+                Text("Text Order")
+                    .foregroundColor(ControlTheme.accent)
+            }
+
+            Section {
                 HStack {
                     Spacer()
                     Button("Save as New Profile…") {
@@ -240,6 +264,33 @@ struct AppearanceSettingsView: View {
             appState.hasUnsavedAppearanceChanges = isDirty
         }
         .sheet(isPresented: $showingSaveSheet) { saveSheet }
+    }
+
+    @ViewBuilder
+    private func orderRows(items: Binding<[DisplayTextItem]>) -> some View {
+        ForEach(items.wrappedValue.indices, id: \.self) { index in
+            HStack {
+                Image(systemName: "line.3.horizontal")
+                    .foregroundColor(.secondary)
+                    .frame(width: 20)
+                Text(items.wrappedValue[index].displayName)
+                Spacer()
+                Button {
+                    items.wrappedValue.swapAt(index, index - 1)
+                } label: {
+                    Image(systemName: "chevron.up")
+                }
+                .buttonStyle(.borderless)
+                .disabled(index == 0)
+                Button {
+                    items.wrappedValue.swapAt(index, index + 1)
+                } label: {
+                    Image(systemName: "chevron.down")
+                }
+                .buttonStyle(.borderless)
+                .disabled(index == items.wrappedValue.count - 1)
+            }
+        }
     }
 
     private func colorRow(_ label: String, hex: Binding<String>) -> some View {
