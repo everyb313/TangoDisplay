@@ -226,6 +226,19 @@ final class SetlistManager: ObservableObject {
             return val
         }
 
+        // Skips Apple machine-generated COMM frames (iTunNORM, iTunSMPB, iTunPGAP, etc.) that
+        // store binary data as hex strings — AVFoundation returns all COMM frames and .first may
+        // land on one of these instead of the human-readable comment.
+        func humanReadableComment() -> String? {
+            let items = AVMetadataItem.metadataItems(from: metadata, filteredByIdentifier: .id3MetadataComments)
+            for item in items {
+                let info = item.extraAttributes?[AVMetadataExtraAttributeKey.info] as? String ?? ""
+                guard !info.hasPrefix("iTun") else { continue }
+                if let val = item.stringValue, !val.isEmpty { return val }
+            }
+            return nil
+        }
+
         // M4A predefined genre: `gnre` atom stores an integer (ID3v1 index + 1).
         // Music.app uses this when the user picks from its genre dropdown rather than typing.
         func predefinedGenreName() -> String? {
@@ -253,7 +266,7 @@ final class SetlistManager: ObservableObject {
 
         let year: Int? = string(for: .id3MetadataYear).flatMap { Int($0) }
             ?? string(for: .iTunesMetadataReleaseDate).flatMap { Int(String($0.prefix(4))) }
-        let comment = string(for: .id3MetadataComments)
+        let comment = humanReadableComment()
             ?? string(for: .iTunesMetadataUserComment)
         let albumArtist = string(for: .id3MetadataBand)
             ?? string(for: .iTunesMetadataAlbumArtist)

@@ -2,6 +2,7 @@ import AVFoundation
 import AppKit
 import Combine
 import Foundation
+import OSLog
 import TangoDisplayCore
 
 final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
@@ -87,7 +88,10 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
 
     @objc private func handleEngineConfigChange() {
         try? audioEngine.start()
-        if isActivePlaying { playerNode.play() }
+        if isActivePlaying {
+            seekTo(elapsed)
+            playerNode.play()
+        }
     }
 
     private func applyOutputDevice(_ uid: String) {
@@ -325,6 +329,8 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
                 DispatchQueue.main.async { self?.handleTrackEnd(generation: gen) }
             }
         } catch {
+            os_log(.error, "TangoDisplay: failed to load %{public}@: %{public}@",
+                   entry.fileURL.path, error.localizedDescription)
             audioFile = nil
         }
         currentEntryID = entry.id
