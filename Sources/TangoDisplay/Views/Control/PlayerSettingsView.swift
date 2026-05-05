@@ -4,6 +4,9 @@ struct PlayerSettingsView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var settings: AppSettings
 
+    @State private var jriverZones: [JRiverZone] = []
+    @State private var isLoadingZones = false
+
     var body: some View {
         Form {
             Section {
@@ -23,6 +26,34 @@ struct PlayerSettingsView: View {
             } header: {
                 Text("Notes")
                     .foregroundColor(ControlTheme.accent)
+            }
+
+            if settings.selectedPlayer == .jriver {
+                Section {
+                    LabeledContent("Zone:") {
+                        HStack(spacing: 8) {
+                            Picker("", selection: $settings.jriverZoneID) {
+                                Text("Active (follows current)").tag(-1)
+                                ForEach(jriverZones) { zone in
+                                    Text(zone.name).tag(zone.id)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .fixedSize()
+                            Button(isLoadingZones ? "Loading…" : "Refresh") {
+                                loadJRiverZones()
+                            }
+                            .disabled(isLoadingZones)
+                        }
+                    }
+                    Text("Pin TangoDisplay to a specific zone so pre-listening in another zone never affects the display.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } header: {
+                    Text("Zone")
+                        .foregroundColor(ControlTheme.accent)
+                }
+                .onAppear { if jriverZones.isEmpty { loadJRiverZones() } }
             }
 
             if settings.selectedPlayer == .builtIn {
@@ -104,6 +135,14 @@ struct PlayerSettingsView: View {
         .onAppear { appState.refreshAudioOutputDeviceList() }
     }
 
+    private func loadJRiverZones() {
+        isLoadingZones = true
+        JRiverPoller.fetchZones { zones in
+            jriverZones = zones
+            isLoadingZones = false
+        }
+    }
+
     @ViewBuilder
     private var playerStatusInfo: some View {
         switch settings.selectedPlayer {
@@ -159,6 +198,14 @@ struct PlayerSettingsView: View {
                 }
                 Label {
                     Text("JRiver must be running with Media Network enabled (Tools → Options → Media Network). Connects to 127.0.0.1 on the default MCWS port.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } icon: {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.secondary)
+                }
+                Label {
+                    Text("If you use multiple zones (e.g. Player + Prelistening), use the Zone picker below to pin TangoDisplay to a specific zone.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } icon: {

@@ -53,6 +53,8 @@ Polls JRiver's MCWS HTTP API at `127.0.0.1:52199` every 2 seconds. Full playlist
 
 **Requirements:** JRiver Media Center must be running with **Media Network** enabled (Tools → Options → Media Network → Enable Media Network). No additional configuration is needed — TangoDisplay connects to localhost on the default MCWS port.
 
+**Multiple zones:** If you run more than one JRiver zone (e.g. Player + Prelistening), go to **Settings › Player › Zone** and pick the zone TangoDisplay should monitor. Click **Refresh** to populate the list from JRiver, then select your main output zone. The pre-listening zone will be ignored. Defaults to *Active (follows current)*, which preserves the previous single-zone behaviour.
+
 ---
 
 ### Built-in Player

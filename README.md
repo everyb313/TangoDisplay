@@ -24,7 +24,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 - **Album Artwork** — display the current track's artwork on the dancer screen; enable per context (dance tracks, cortinas, or both) with configurable opacity, scale, and position. Supported for Music.app, Swinsian, and Embrace.
 - **Singer line** — display the vocalist name; choose the source — **Comments** or **Album Artist** — via the Singer Source picker in Appearance. Configurable font and color. Enable per context (dance tracks, cortinas, or both). Supported for Music.app, Swinsian, and Embrace.
 - **Text order** — drag items into any order you like for three independent sections — dance-track display, cortina track display, and the cortina "Coming Up" preview — per appearance profile
-- **Player Source** — choose Music.app (default), Swinsian (real-time notifications; queue-based look-ahead), Embrace (full playlist lookahead and tanda counting via AppleScript), JRiver Media Center (MCWS HTTP API; full playlist lookahead and tanda counting), or the Built-in Player. See [Supported Players](https://github.com/richardsladetdj-creator/TangoDisplay/wiki/Supported-Players) for a full feature matrix.
+- **Player Source** — choose Music.app (default), Swinsian (real-time notifications; queue-based look-ahead), Embrace (full playlist lookahead and tanda counting via AppleScript), JRiver Media Center (MCWS HTTP API; full playlist lookahead and tanda counting; zone selection lets you pin TangoDisplay to a specific zone so a pre-listening zone never affects the display), or the Built-in Player. See [Supported Players](https://github.com/richardsladetdj-creator/TangoDisplay/wiki/Supported-Players) for a full feature matrix.
 - **Update indicator** — a small dot in the sidebar shows when a newer release is available; click to open the releases page
 
 ---
@@ -37,7 +37,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 | Music.app | Required only when using Music.app as the player source. Not needed with the built-in player. Must be running and playing from a playlist. |
 | Swinsian | Required only if selecting Swinsian as the player source in Settings › Player. |
 | Embrace | Required only if selecting Embrace as the player source in Settings › Player. |
-| JRiver Media Center | Required only if selecting JRiver as the player source. Must be running with Media Network enabled (Tools → Options → Media Network). Connects to 127.0.0.1 on the default MCWS port (52199). |
+| JRiver Media Center | Required only if selecting JRiver as the player source. Must be running with Media Network enabled (Tools → Options → Media Network). Connects to 127.0.0.1 on the default MCWS port (52199). If using multiple zones, select the output zone in Settings › Player › Zone. |
 | Xcode Command Line Tools | `xcode-select --install` — no full Xcode needed |
 
 ---
@@ -47,7 +47,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.1.0-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.2.0-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -133,6 +133,9 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.2.0
+- **New (JRiver):** Zone selection. DJs running multiple JRiver zones (e.g. Player + Prelistening) can now pin TangoDisplay to a specific zone. Go to **Settings › Player › Zone**, click **Refresh** to discover available zones, and select the one to monitor. The pre-listening zone is then ignored entirely. Defaults to *Active (follows current)* — no behaviour change for single-zone setups.
 
 ### v3.1.0
 - **New: JRiver Media Center** is now a supported player source. Select **JRiver Media Center** in Settings › Player. TangoDisplay polls the MCWS HTTP API at `127.0.0.1:52199` every 2 seconds. Playlist look-ahead, tanda counting (Track N of M), coming-up cortina preview, album artwork, year, and singer/comment are all fully supported. JRiver must be running with Media Network enabled (Tools → Options → Media Network).

@@ -2,11 +2,21 @@ import Foundation
 import AppKit
 import TangoDisplayCore
 
+struct JRiverZone: Identifiable, Equatable {
+    let id: Int
+    let name: String
+}
+
 final class JRiverPoller: MusicPlayerSource {
 
     private let baseURL = "http://127.0.0.1:52199/MCWS/v1"
+    private let zoneID: Int
     private let session = URLSession.shared
     private let timerQueue = DispatchQueue(label: "com.tangodisplay.jriverpollertimer", qos: .utility)
+
+    init(zoneID: Int = -1) {
+        self.zoneID = zoneID
+    }
 
     private var timer: DispatchSourceTimer?
     private var consecutiveFailures = 0
@@ -48,7 +58,7 @@ final class JRiverPoller: MusicPlayerSource {
 
     func triggerPlaylistFetch() {
         fetchPlaylistRange()
-        if let url = URL(string: "\(baseURL)/Playback/Info?Zone=-1&Format=XML") {
+        if let url = URL(string: "\(baseURL)/Playback/Info?Zone=\(zoneID)&Format=XML") {
             session.dataTask(with: url) { [weak self] data, _, _ in
                 guard let self,
                       let data,
@@ -91,7 +101,7 @@ final class JRiverPoller: MusicPlayerSource {
     // MARK: - Step 1: Playback state + current track basics
 
     private func doPoll() {
-        guard let url = URL(string: "\(baseURL)/Playback/Info?Zone=-1&Fields=Genre&Format=XML") else {
+        guard let url = URL(string: "\(baseURL)/Playback/Info?Zone=\(zoneID)&Fields=Genre&Format=XML") else {
             handleFailure()
             DispatchQueue.main.async {
                 self.onTrackUpdate?(nil, .stopped)
@@ -257,7 +267,7 @@ final class JRiverPoller: MusicPlayerSource {
         let limit      = min(lookback + 1 + lookahead, maxLimit)
         guard limit > 0 else { return }
 
-        guard let url = URL(string: "\(baseURL)/Playback/Playlist?Action=MPL&StartIndex=\(startIndex)&Limit=\(limit)&Format=XML") else {
+        guard let url = URL(string: "\(baseURL)/Playback/Playlist?Action=MPL&Zone=\(zoneID)&StartIndex=\(startIndex)&Limit=\(limit)&Format=XML") else {
             return
         }
 
@@ -307,6 +317,41 @@ final class JRiverPoller: MusicPlayerSource {
             ))
         }
         return tracks
+    }
+
+    // MARK: - Zone discovery
+
+    static func fetchZones(completion: @escaping ([JRiverZone]) -> Void) {
+        guard let url = URL(string: "http://127.0.0.1:52199/MCWS/v1/Playback/Zones?Format=XML") else {
+            completion([]); return
+        }
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data, let xml = String(data: data, encoding: .utf8) else {
+                DispatchQueue.main.async { completion([]) }; return
+            }
+            // Response uses flat items: ZoneID0/ZoneName0, ZoneID1/ZoneName1, …
+            let countStr = staticExtractItemValue(xml, itemName: "NumberZones")
+            guard let count = Int(countStr), count > 0 else {
+                DispatchQueue.main.async { completion([]) }; return
+            }
+            var zones: [JRiverZone] = []
+            for i in 0..<count {
+                let idStr = staticExtractItemValue(xml, itemName: "ZoneID\(i)")
+                let name  = staticExtractItemValue(xml, itemName: "ZoneName\(i)")
+                if let id = Int(idStr), !name.isEmpty {
+                    zones.append(JRiverZone(id: id, name: name))
+                }
+            }
+            DispatchQueue.main.async { completion(zones) }
+        }.resume()
+    }
+
+    private static func staticExtractItemValue(_ xml: String, itemName: String) -> String {
+        let pattern = "<Item Name=\"\(itemName)\">(.*?)</Item>"
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: xml, range: NSRange(xml.startIndex..., in: xml)),
+              let range = Range(match.range(at: 1), in: xml) else { return "" }
+        return String(xml[range])
     }
 
     // MARK: - XML parsing

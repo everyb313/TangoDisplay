@@ -78,6 +78,7 @@ final class AppState: ObservableObject {
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
         observePlayerSelection()
+        observeJRiverZone()
     }
 
     // MARK: - Lifecycle
@@ -100,7 +101,7 @@ final class AppState: ObservableObject {
         case .musicApp: return MusicPoller()
         case .swinsian: return SwinsianMonitor()
         case .embrace:  return EmbracMonitor()
-        case .jriver:   return JRiverPoller()
+        case .jriver:   return JRiverPoller(zoneID: settings.jriverZoneID)
         case .builtIn:  return LocalPlayerSource(setlist: setlist, settings: settings, volume: settings.builtInVolume)
         }
     }
@@ -137,6 +138,17 @@ final class AppState: ObservableObject {
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] choice in self?.switchSource(to: choice) }
+            .store(in: &cancellables)
+    }
+
+    private func observeJRiverZone() {
+        settings.$jriverZoneID
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                guard let self, self.settings.selectedPlayer == .jriver else { return }
+                self.switchSource(to: .jriver)
+            }
             .store(in: &cancellables)
     }
 
