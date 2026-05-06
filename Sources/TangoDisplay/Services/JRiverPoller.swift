@@ -205,10 +205,9 @@ final class JRiverPoller: MusicPlayerSource {
                 if !cm.isEmpty { comment = cm }
             }
 
-            let displayArtist = albumArtist ?? artist
             let track = Track(
                 title: title,
-                artist: displayArtist,
+                artist: artist,
                 genre: genre,
                 persistentID: fileKey,
                 year: year,
@@ -243,10 +242,9 @@ final class JRiverPoller: MusicPlayerSource {
             let yearStr = self.extractFieldValue(xml, fieldName: "Date (year)")
             let cm      = self.decodeXML(self.extractFieldValue(xml, fieldName: "Comment"))
 
-            let displayArtist = aa.isEmpty ? artist : aa
             let nextTrack = Track(
                 title: title,
-                artist: displayArtist,
+                artist: artist,
                 genre: genre,
                 persistentID: fileKey,
                 year: Int(yearStr),
@@ -308,7 +306,7 @@ final class JRiverPoller: MusicPlayerSource {
 
             tracks.append(Track(
                 title: title,
-                artist: aa.isEmpty ? artist : aa,
+                artist: artist,
                 genre: genre,
                 persistentID: fileKey,
                 year: Int(yearStr),
