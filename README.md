@@ -48,7 +48,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.7.0-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.7.1-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -134,6 +134,9 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.7.1
+- **Fix (Built-In Player):** Tracks with audio running to the very end of the file no longer have their final second cut off. The completion callback now fires only after audio has been fully played back through the hardware output, so the player no longer discards the tail of a track that has no built-in trailing silence.
 
 ### v3.7.0
 - **New: Track Info Transformations** — a new **Advanced** section in Settings lets you apply optional regex-based rules to how Artist, Title, Year, Album Artist, and Comments are displayed on the dancer screen — without modifying the original music tags. Each field has an independent enable toggle, a regex pattern field, a replacement template (supporting `$1`, `$2` capture groups), a live test-input field with instant result preview, and a per-field reset. A reset-all confirmation is available at the bottom of the panel. Transformations are applied in real time on both the dance-track and cortina views.

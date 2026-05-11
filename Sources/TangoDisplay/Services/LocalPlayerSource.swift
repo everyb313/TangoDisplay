@@ -364,7 +364,8 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
         audioStartSampleTime = 0
         scheduleGeneration += 1
         let gen = scheduleGeneration
-        playerNode.scheduleSegment(file, startingFrame: startFrame, frameCount: frameCount, at: nil) { [weak self] in
+        playerNode.scheduleSegment(file, startingFrame: startFrame, frameCount: frameCount,
+                                   at: nil, completionCallbackType: .dataPlayedBack) { [weak self] _ in
             DispatchQueue.main.async { self?.handleTrackEnd(generation: gen) }
         }
         if wasPlaying { playerNode.play() }
@@ -444,7 +445,7 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
             prevTrackSilenceAtEnd = 0
             nextTrackSilenceAtStart = 0
 
-            playerNode.scheduleFile(file, at: nil) { [weak self] in
+            playerNode.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack) { [weak self] _ in
                 DispatchQueue.main.async { self?.handleTrackEnd(generation: gen) }
             }
 
