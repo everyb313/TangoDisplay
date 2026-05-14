@@ -63,7 +63,7 @@ struct ControlView: View {
         } detail: {
             detail
         }
-        .frame(minWidth: 700, minHeight: 500)
+        .frame(minWidth: 820, minHeight: 660)
         .preferredColorScheme(.dark)
         .alert("Unsaved Changes", isPresented: $showingUnsavedChangesAlert) {
             Button("Leave Without Saving", role: .destructive) {
@@ -197,7 +197,8 @@ struct ControlView: View {
             VStack(spacing: 0) {
                 if appState.settings.mirrorMode {
                     PreviewPane()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(CGFloat(16) / CGFloat(9), contentMode: .fit)
                 }
                 StatusPane(showingOverride: $showingOverride)
                     .frame(maxWidth: .infinity)

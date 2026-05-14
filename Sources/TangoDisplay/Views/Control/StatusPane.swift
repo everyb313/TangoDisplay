@@ -17,7 +17,7 @@ struct StatusPane: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
 
             // Status row
             HStack(spacing: 8) {
@@ -27,38 +27,57 @@ struct StatusPane: View {
                 Spacer()
             }
 
-            // Control buttons
+            // Control buttons (including Last Tanda as 4th)
             HStack(spacing: 8) {
-                Button("Force Poll (⌘⇧R)") { appState.pollNow() }
-                    .buttonStyle(.bordered)
+                Button { appState.pollNow() } label: {
+                    Label("Force Poll (⌘⇧R)", systemImage: "arrow.clockwise")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
 
-                Button("Override… (⌘⇧O)") { showingOverride = true }
-                    .buttonStyle(.bordered)
+                Button { showingOverride = true } label: {
+                    Label("Override… (⌘⇧O)", systemImage: "display")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
 
-                Button(appState.isDisplayPausedByUser ? "Unpause Display (⌘⇧P)" : "Pause Display (⌘⇧P)") {
-                    appState.togglePaused()
+                Button { appState.togglePaused() } label: {
+                    Label(
+                        appState.isDisplayPausedByUser ? "Unpause Display (⌘⇧P)" : "Pause Display (⌘⇧P)",
+                        systemImage: appState.isDisplayPausedByUser ? "play" : "pause"
+                    )
+                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
                 .tint(appState.isDisplayPausedByUser ? .orange : nil)
+                .frame(maxWidth: .infinity)
+
+                Button { appState.activateLastTanda(!appState.isLastTandaActive) } label: {
+                    Label("Last Tanda", systemImage: appState.isLastTandaActive ? "flag.fill" : "flag")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(appState.isLastTandaActive ? .red : nil)
+                .disabled(!isLastTandaEnabled)
+                .help(isLastTandaEnabled ? "" : "Set Last Tanda label in Appearance Settings to enable.")
+                .frame(maxWidth: .infinity)
             }
 
-            // Last Tanda toggle
-            Toggle(isOn: Binding(
-                get: { appState.isLastTandaActive },
-                set: { appState.activateLastTanda($0) }
-            )) {
-                Label("Last Tanda", systemImage: appState.isLastTandaActive ? "flag.fill" : "flag")
-            }
-            .toggleStyle(.button)
-            .tint(.red)
-            .disabled(!isLastTandaEnabled)
-            .help(isLastTandaEnabled ? "" : "Set Last Tanda label in Appearance Settings to enable.")
-
-            Divider()
-
-            // Current track info
+            // Current track info card
             if let track = appState.displayState.currentTrack {
-                trackInfoRows(track: track)
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Current Track")
+                        .font(.system(size: 13, weight: .semibold))
+                    trackInfoRows(track: track)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.white.opacity(0.04))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.secondary.opacity(0.3), lineWidth: 0.5))
             } else {
                 Text("No track playing")
                     .font(.system(size: 12))
@@ -87,7 +106,8 @@ struct StatusPane: View {
                     .foregroundColor(ControlTheme.accent)
             }
         }
-        .padding()
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
     }
 
     private var playerBadge: some View {
@@ -129,20 +149,26 @@ struct StatusPane: View {
     }
 
     private var watchdogIndicator: some View {
-        HStack(spacing: 5) {
-            Image(systemName: appState.watchdogActive ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                .foregroundColor(appState.watchdogActive ? .orange : .green)
-                .font(.system(size: 12))
-            Text(appState.watchdogActive
-                ? "\(appState.settings.selectedPlayer.displayName) unreachable"
-                : (appState.settings.selectedPlayer == .swinsian ? "Listening" : "Polling OK"))
-                .font(.system(size: 12))
-                .foregroundColor(appState.watchdogActive ? .orange : .secondary)
+        let color: Color = appState.watchdogActive ? .orange : .green
+        let icon = appState.watchdogActive ? "exclamationmark.triangle.fill" : "checkmark.circle.fill"
+        let label = appState.watchdogActive
+            ? "\(appState.settings.selectedPlayer.displayName) unreachable"
+            : (appState.settings.selectedPlayer == .swinsian ? "Listening" : "Polling OK")
+        return HStack(spacing: 6) {
+            Image(systemName: icon)
+                .foregroundColor(color)
+                .font(.system(size: 10))
+            Text(label)
+                .font(.system(size: 13, weight: .semibold))
         }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(color.opacity(0.12))
+        .clipShape(Capsule())
     }
 
     private func trackInfoRows(track: Track) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 7) {
             infoRow("Title",  track.title)
             infoRow("Artist", track.artist)
             infoRow("Genre",  track.genre.isEmpty ? "(empty)" : track.genre)
@@ -154,13 +180,13 @@ struct StatusPane: View {
     }
 
     private func infoRow(_ label: String, _ value: String) -> some View {
-        HStack(alignment: .top, spacing: 6) {
-            Text(label + ":")
-                .font(.system(size: 12, weight: .semibold))
+        HStack(alignment: .top, spacing: 8) {
+            Text(label)
+                .font(.system(size: 13, weight: .regular))
                 .foregroundColor(.secondary)
-                .frame(width: 48, alignment: .trailing)
+                .frame(width: 52, alignment: .trailing)
             Text(value)
-                .font(.system(size: 12))
+                .font(.system(size: 13))
                 .lineLimit(1)
         }
     }

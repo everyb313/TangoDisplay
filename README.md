@@ -48,7 +48,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.11.1-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.12.0-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -134,6 +134,11 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.12.0
+- **New (Appearance):** Two new transition styles — **Push** (slides the new content in from the right as the old content exits left) and **Zoom** (new content scales up from small, old content scales out large). Both are available in **Appearance › Artwork & Motion › Transition › Style**.
+- **Improvement (Control Window):** Status pane buttons (Force Poll, Override, Pause Display, Last Tanda) now display SF Symbol icons and expand to equal widths. Current track info is shown in a styled card. The control window minimum size is increased to 820 × 660.
+- **Improvement (Preview Pane):** The preview in the control window now fills the available width at a fixed 16:9 aspect ratio, matching the display screen proportions more accurately.
 
 ### v3.11.1
 - **Fix (Appearance Settings):** Track counter font changes in Appearance › Text now take effect on the display. Previously the font was hardcoded; only the colour setting was applied correctly.

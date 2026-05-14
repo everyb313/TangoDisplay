@@ -70,13 +70,8 @@ struct AppearanceVisibilityTab: View {
     // MARK: - Helpers
 
     private func orderHeader(_ subtitle: String) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text("Text Order")
-                .foregroundColor(ControlTheme.accent)
-            Text(subtitle)
-                .font(.caption)
-                .foregroundColor(.secondary)
-        }
+        Text("Text Order for \(subtitle)")
+            .foregroundColor(ControlTheme.accent)
     }
 
     private func visibilityRow(_ label: String, dance: Binding<Bool>, cortina: Binding<Bool>) -> some View {

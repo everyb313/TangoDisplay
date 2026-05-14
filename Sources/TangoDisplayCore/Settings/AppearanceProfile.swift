@@ -539,12 +539,16 @@ public enum TransitionStyle: String, Codable, CaseIterable {
     case fade
     case cut
     case fadeToBlack
+    case push
+    case zoom
 
     public var displayName: String {
         switch self {
-        case .fade: "Crossfade"
-        case .cut: "Hard Cut"
+        case .fade:        "Crossfade"
+        case .cut:         "Hard Cut"
         case .fadeToBlack: "Fade Through Black"
+        case .push:        "Push"
+        case .zoom:        "Zoom"
         }
     }
 }

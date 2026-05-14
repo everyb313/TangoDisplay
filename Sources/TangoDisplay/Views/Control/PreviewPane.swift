@@ -12,12 +12,11 @@ struct PreviewPane: View {
 
     var body: some View {
         GeometryReader { geo in
-            let scale = min(geo.size.width / targetWidth,
-                            geo.size.height / targetHeight)
-            let pw = targetWidth  * scale
-            let ph = targetHeight * scale
+            let scale = geo.size.width / targetWidth
+            let pw    = geo.size.width
+            let ph    = targetHeight * scale
 
-            ZStack {
+            ZStack(alignment: .topLeading) {
                 // Mirror the PresentationView at scale
                 PresentationView(isPreview: true)
                     .environmentObject(appState)
@@ -35,6 +34,5 @@ struct PreviewPane: View {
             }
             .frame(width: geo.size.width, height: geo.size.height)
         }
-        .padding(8)
     }
 }

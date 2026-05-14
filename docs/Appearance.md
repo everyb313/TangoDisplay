@@ -112,7 +112,7 @@ Click any colour swatch to open the macOS colour picker.
 
 | Setting | Description |
 |---|---|
-| **Style** | How the display transitions between tracks. Options include *Fade Through Black*, *Cross-Fade*, and *Cut*. |
+| **Style** | How the display transitions between tracks. Options: *Crossfade*, *Hard Cut*, *Fade Through Black*, *Push* (slides in from the right), and *Zoom* (scales in/out). |
 | **Duration** | Length of the transition in seconds (drag the slider). |
 
 ### Album Artwork
