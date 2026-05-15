@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.15.0-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.15.1-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,9 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.15.1
+- **Fix (Built-In Player):** Resolved a crash (`EXC_CRASH`) that occurred when playing a track via Swinsian. When loading a new track, the audio engine fires a configuration-change notification asynchronously; the stale `tapInstalled` flag caused a second `installTapOnBus` call on an already-occupied bus, throwing an uncaught `NSException`. The tap is now always cleanly removed before reinstalling.
 
 ### v3.15.0
 - **New (Built-In Player):** ReplayGain volume normalisation. Enable **ReplayGain** in **Settings › Player › ReplayGain** or via the new **ReplayGain** toolbar button (waveform icon) alongside EQ, Balance, and Auto-gap. Four modes: **Off**, **Track** (uses per-track RG tags), **Album** (uses album RG tags), and **Auto** (recommended — uses metadata when available; analyses the file against a configurable target loudness when absent). Controls include **Prevent clipping**, a **Preamp** slider (−12 to +6 dB), and a **Target Loudness** slider (−23 to −14 LUFS, active in Auto mode). Both the toolbar popover and Player Settings display a **Recommended** badge next to the Auto option. A live status line in the player controls shows the active gain (e.g. "Auto +2.3 dB · −18.0 LUFS") while a track is playing.

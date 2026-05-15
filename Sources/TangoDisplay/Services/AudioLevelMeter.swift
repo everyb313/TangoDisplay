@@ -26,10 +26,7 @@ final class AudioLevelMeter: ObservableObject {
     }
 
     func reinstallTap() {
-        if tapInstalled {
-            tapInstalled = false
-            mixerNode.removeTap(onBus: 0)
-        }
+        mixerNode.removeTap(onBus: 0)
         installTap()
     }
 
@@ -55,7 +52,6 @@ final class AudioLevelMeter: ObservableObject {
     private let mixerNode: AVAudioMixerNode
     private let rawLock = OSAllocatedUnfairLock(initialState: RawLevels())
     private var displayTimer: Timer?
-    private var tapInstalled = false
 
     private var leftPeakState: PeakState = .holding(value: 0, since: .distantPast)
     private var rightPeakState: PeakState = .holding(value: 0, since: .distantPast)
@@ -72,12 +68,6 @@ final class AudioLevelMeter: ObservableObject {
         displayTimer = timer
     }
 
-    // Called by LocalPlayerSource before reconnecting nodes or restarting the engine,
-    // so reinstallTap() knows the engine already removed the tap.
-    func engineDidReconfigure() {
-        tapInstalled = false
-    }
-
     deinit {
         displayTimer?.invalidate()
         // Don't call removeTap here: the engine owns the tap and removes it when
@@ -91,7 +81,6 @@ final class AudioLevelMeter: ObservableObject {
         mixerNode.installTap(onBus: 0, bufferSize: 1024, format: nil) { [weak self] buffer, _ in
             self?.processBuffer(buffer)
         }
-        tapInstalled = true
     }
 
     private func processBuffer(_ buffer: AVAudioPCMBuffer) {

@@ -137,7 +137,6 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
             }
             do {
                 try self.audioEngine.start()
-                self.levelMeter.engineDidReconfigure()
                 self.levelMeter.reinstallTap()
                 self.applyBalance(self._balance)
             } catch {
