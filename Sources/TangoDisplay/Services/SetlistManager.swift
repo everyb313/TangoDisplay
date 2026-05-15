@@ -340,9 +340,11 @@ final class SetlistManager: ObservableObject {
         let genre = genreID3 ?? genreiTunes ?? genrePredefined ?? genreVorbis
             ?? genreRawTcon ?? SetlistManager.genreFromAudioToolbox(url) ?? ""             // AIFF ID3 chunk (AVFoundation misses these)
 
-        let yearFromID3    = (await string(for: .id3MetadataYear)).flatMap { Int($0) }
-        let yearFromiTunes = (await string(for: .iTunesMetadataReleaseDate)).flatMap { Int(String($0.prefix(4))) }
-        let year: Int?     = yearFromID3 ?? yearFromiTunes
+        let yearFromTYER    = (await string(for: .id3MetadataYear)).flatMap { Int($0) }
+        let yearFromiTunes  = (await string(for: .iTunesMetadataReleaseDate)).flatMap { Int(String($0.prefix(4))) }
+        let yearFromRawTdrc = (await string(forRawKey: "tdrc")).flatMap { Int(String($0.prefix(4))) }
+        let year: Int?      = yearFromTYER ?? yearFromiTunes ?? yearFromRawTdrc
+                           ?? SetlistManager.yearFromAudioToolbox(url)               // AIFF ID3v2.2 TYE frame
         let commentFromID3    = await humanReadableComment()
         let commentFromiTunes = await string(for: .iTunesMetadataUserComment)
         let comment = commentFromID3 ?? commentFromiTunes
@@ -409,6 +411,23 @@ final class SetlistManager: ObservableObject {
               let genre = info[kAFInfoDictionary_Genre as String] as? String,
               !genre.isEmpty else { return nil }
         return genre
+    }
+
+    private static func yearFromAudioToolbox(_ url: URL) -> Int? {
+        var audioFile: AudioFileID?
+        guard AudioFileOpenURL(url as CFURL, .readPermission, 0, &audioFile) == noErr,
+              let af = audioFile else { return nil }
+        defer { AudioFileClose(af) }
+
+        var dataSize = UInt32(MemoryLayout<CFDictionary>.size)
+        var cfDictRef: Unmanaged<CFDictionary>? = nil
+        guard AudioFileGetProperty(af, kAudioFilePropertyInfoDictionary, &dataSize, &cfDictRef) == noErr,
+              let info = cfDictRef?.takeRetainedValue() as? [String: Any] else { return nil }
+        if let s = info[kAFInfoDictionary_Year as String] as? String, !s.isEmpty,
+           let y = Int(s.prefix(4)) { return y }
+        if let s = info[kAFInfoDictionary_RecordedDate as String] as? String, !s.isEmpty,
+           let y = Int(s.prefix(4)) { return y }
+        return nil
     }
 }
 

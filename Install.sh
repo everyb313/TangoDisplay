@@ -68,9 +68,9 @@ cat > "$CONTENTS/Info.plist" <<EOF
   <key>CFBundleIconFile</key>
   <string>icon</string>
   <key>CFBundleVersion</key>
-  <string>47</string>
+  <string>48</string>
   <key>CFBundleShortVersionString</key>
-  <string>3.15.2</string>
+  <string>3.15.3</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>
