@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VersionBadgeView: View {
     @EnvironmentObject var checker: VersionChecker
+    @EnvironmentObject var sparkleUpdater: SparkleUpdater
 
     var body: some View {
         HStack(spacing: 5) {
@@ -11,14 +12,14 @@ struct VersionBadgeView: View {
                 .foregroundStyle(.secondary)
             if checker.updateAvailable, let latest = checker.latestVersion {
                 Button {
-                    NSWorkspace.shared.open(checker.releasesPageURL)
+                    sparkleUpdater.checkForUpdates()
                 } label: {
                     Text("v\(latest) ↗")
                         .font(.caption)
                         .foregroundStyle(.red.opacity(0.85))
                 }
                 .buttonStyle(.plain)
-                .help("Open release notes for v\(latest)")
+                .help("Install update v\(latest)")
             }
             Spacer()
         }

@@ -83,12 +83,29 @@ cat > "$CONTENTS/Info.plist" <<EOF
   <!-- Required for global hotkeys (⌘⇧O/P/R) -->
   <key>NSInputMonitoringUsageDescription</key>
   <string>TangoDisplay uses global keyboard shortcuts so you can trigger overrides and pauses without switching windows.</string>
+  <!-- Sparkle auto-update -->
+  <key>SUFeedURL</key>
+  <string>https://raw.githubusercontent.com/richardsladetdj-creator/TangoDisplay/main/appcast.xml</string>
+  <key>SUPublicEDKey</key>
+  <string>BUHKUUjLMvf3imY9/qbRJiES6Vq7/C3w94lkRB37CJw=</string>
 </dict>
 </plist>
 EOF
 
+echo "== Embed Sparkle framework =="
+SPARKLE_FW="$ROOT_DIR/.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
+if [[ ! -d "$SPARKLE_FW" ]]; then
+  echo "ERROR: Sparkle framework not found at $SPARKLE_FW"
+  echo "       Run: swift package resolve"
+  exit 1
+fi
+mkdir -p "$CONTENTS/Frameworks"
+cp -R "$SPARKLE_FW" "$CONTENTS/Frameworks/"
+
 # Ad-hoc sign — satisfies Gatekeeper on most machines without a developer account
+# Sign inner bundles before the outer app
 echo "== Codesign (ad-hoc) =="
+codesign --force --deep --sign - "$CONTENTS/Frameworks/Sparkle.framework" || true
 codesign --force --deep --sign - "$APP_DIR" || true
 
 echo "== Install to /Applications =="

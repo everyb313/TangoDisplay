@@ -6,6 +6,9 @@ let package = Package(
     platforms: [
         .macOS(.v13)
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.0.0")
+    ],
     targets: [
         // Pure-logic library — no AppKit/SwiftUI — importable by both the app and the test runner
         .target(
@@ -15,9 +18,15 @@ let package = Package(
         // Main app executable
         .executableTarget(
             name: "TangoDisplay",
-            dependencies: ["TangoDisplayCore"],
+            dependencies: [
+                "TangoDisplayCore",
+                .product(name: "Sparkle", package: "Sparkle")
+            ],
             path: "Sources/TangoDisplay",
-            resources: [.copy("Resources/SetlistLogo.png")]
+            resources: [.copy("Resources/SetlistLogo.png")],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])
+            ]
         ),
         // Lightweight test runner executable — no XCTest needed (CLI tools only, no Xcode.app)
         // Usage: swift run TangoDisplayTests

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>TangoDisplay</title>
+        <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
+        <item>
+            <title>Version 3.15.3</title>
+            <pubDate>Thu, 15 May 2026 19:22:00 +0000</pubDate>
+            <sparkle:version>48</sparkle:version>
+            <sparkle:shortVersionString>3.15.3</sparkle:shortVersionString>
+            <sparkle:releaseNotesLink>https://github.com/richardsladetdj-creator/TangoDisplay/releases/tag/v3.15.3</sparkle:releaseNotesLink>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.15.3/TangoDisplay-v3.15.3-universal.zip"
+                sparkle:edSignature="D1ZIzmM1OLbJPw0hU+Y4VaELZkT98y4UkFyGm2nTlFh2LiPa/qB7+pQ6xX+UigO8yWeOndj5QqZ+KHezyNdbCA=="
+                length="3531526"
+                type="application/zip"/>
+        </item>
+    </channel>
+</rss>

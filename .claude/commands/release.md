@@ -54,6 +54,7 @@ If no docs need updating, skip this step.
 Stage only the files relevant to this release. Do NOT stage unrelated pre-existing modified files — check `git status` and be selective. Typical files to stage:
 - `Install.sh`
 - `README.md`
+- `appcast.xml`
 - Any updated `docs/*.md` files
 - Any source files changed in this release
 
@@ -86,6 +87,42 @@ ditto -c -k --sequesterRsrc --keepParent TangoDisplay.app TangoDisplay-vX.Y.Z-un
 ```
 
 Replace `X.Y.Z` with the actual new version.
+
+---
+
+## Step 7a — Sign the zip and update appcast.xml
+
+Sign the zip with the Sparkle EdDSA key (private key is in the macOS keychain):
+```bash
+.build/artifacts/sparkle/Sparkle/bin/sign_update TangoDisplay-vX.Y.Z-universal.zip
+```
+
+This outputs something like:
+```
+sparkle:edSignature="<signature>" length="<bytes>"
+```
+
+Now prepend a new `<item>` to `appcast.xml`, using the signature and length from above.
+The new item goes immediately after the `<channel>` opening tags, before the existing items:
+
+```xml
+<item>
+    <title>Version X.Y.Z</title>
+    <pubDate><RFC 2822 date, e.g. Mon, 01 Jun 2026 12:00:00 +0000></pubDate>
+    <sparkle:version><CFBundleVersion integer></sparkle:version>
+    <sparkle:shortVersionString>X.Y.Z</sparkle:shortVersionString>
+    <sparkle:releaseNotesLink>https://github.com/richardsladetdj-creator/TangoDisplay/releases/tag/vX.Y.Z</sparkle:releaseNotesLink>
+    <enclosure
+        url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/vX.Y.Z/TangoDisplay-vX.Y.Z-universal.zip"
+        sparkle:edSignature="<signature from sign_update>"
+        length="<length from sign_update>"
+        type="application/zip"/>
+</item>
+```
+
+Stage and commit `appcast.xml` along with the other release files (Step 5 already covers the
+main commit; if appcast is updated after that commit, add a separate commit or amend — but
+**the appcast must be pushed to main before users check for updates**).
 
 ---
 

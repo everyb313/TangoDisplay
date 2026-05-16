@@ -4,6 +4,7 @@ import SwiftUI
 struct TangoDisplayApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var appState = AppState()
+    @StateObject private var sparkleUpdater = SparkleUpdater()
 
     init() {
         // Wire the delegate's appState reference before applicationDidFinishLaunching fires.
@@ -16,6 +17,7 @@ struct TangoDisplayApp: App {
             ControlView()
                 .environmentObject(appState)
                 .environmentObject(appState.settings)
+                .environmentObject(sparkleUpdater)
                 .onAppear {
                     // Pass appState to the delegate (cannot be done in init because
                     // @StateObject is not available until the first render)
