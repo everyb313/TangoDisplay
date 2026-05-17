@@ -8,7 +8,14 @@
             <pubDate>Sat, 17 May 2026 11:25:00 +0000</pubDate>
             <sparkle:version>50</sparkle:version>
             <sparkle:shortVersionString>3.16.0</sparkle:shortVersionString>
-            <sparkle:releaseNotesLink>https://github.com/richardsladetdj-creator/TangoDisplay/releases/tag/v3.16.0</sparkle:releaseNotesLink>
+            <description><![CDATA[
+                <ul>
+                    <li>Audio Unit Plugin support (Beta) — load EQ, dynamics, and filter plugins into the audio chain</li>
+                    <li>Plugin picker filtered to restoration-relevant AU plugins only</li>
+                    <li>Quick-access plugin button in the Setlist toolbar</li>
+                    <li>Fixed: switching plugins no longer shows the previous plugin's editor window</li>
+                </ul>
+            ]]></description>
             <enclosure
                 url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.16.0/TangoDisplay-v3.16.0-universal.zip"
                 sparkle:edSignature="oNkzkArbBU3AlvtSAHVk1our+HYdzKfxq39gRtkxaHSwxCbgPG+8y1Cvm5IREqQ26tvjrqGjiCMn+ZNpAEYgAw=="
@@ -20,7 +27,11 @@
             <pubDate>Fri, 16 May 2026 00:00:00 +0000</pubDate>
             <sparkle:version>49</sparkle:version>
             <sparkle:shortVersionString>3.15.4</sparkle:shortVersionString>
-            <sparkle:releaseNotesLink>https://github.com/richardsladetdj-creator/TangoDisplay/releases/tag/v3.15.4</sparkle:releaseNotesLink>
+            <description><![CDATA[
+                <ul>
+                    <li>Automatic update notifications via Sparkle — TangoDisplay now prompts you when a new version is available and can install it in one click</li>
+                </ul>
+            ]]></description>
             <enclosure
                 url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.15.4/TangoDisplay-v3.15.4-universal.zip"
                 sparkle:edSignature="Ww8HBl8JboXTH9IDf8JX7DFbt1UBCwediLVej82qIIa6zbAl+JtfMwu6IMxudPMnfz4893foUA2dMQ+vI6o1Cg=="
@@ -32,7 +43,12 @@
             <pubDate>Thu, 15 May 2026 19:22:00 +0000</pubDate>
             <sparkle:version>48</sparkle:version>
             <sparkle:shortVersionString>3.15.3</sparkle:shortVersionString>
-            <sparkle:releaseNotesLink>https://github.com/richardsladetdj-creator/TangoDisplay/releases/tag/v3.15.3</sparkle:releaseNotesLink>
+            <description><![CDATA[
+                <ul>
+                    <li>Fix: Year tag now reads correctly from AIFF files tagged with ID3v2.2 (TYE frame)</li>
+                    <li>Fix: Year tag now reads correctly from files using the ID3v2.4 TDRC frame</li>
+                </ul>
+            ]]></description>
             <enclosure
                 url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.15.3/TangoDisplay-v3.15.3-universal.zip"
                 sparkle:edSignature="D1ZIzmM1OLbJPw0hU+Y4VaELZkT98y4UkFyGm2nTlFh2LiPa/qB7+pQ6xX+UigO8yWeOndj5QqZ+KHezyNdbCA=="

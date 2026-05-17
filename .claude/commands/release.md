@@ -111,7 +111,12 @@ The new item goes immediately after the `<channel>` opening tags, before the exi
     <pubDate><RFC 2822 date, e.g. Mon, 01 Jun 2026 12:00:00 +0000></pubDate>
     <sparkle:version><CFBundleVersion integer></sparkle:version>
     <sparkle:shortVersionString>X.Y.Z</sparkle:shortVersionString>
-    <sparkle:releaseNotesLink>https://github.com/richardsladetdj-creator/TangoDisplay/releases/tag/vX.Y.Z</sparkle:releaseNotesLink>
+    <description><![CDATA[
+        <ul>
+            <li><release note 1></li>
+            <li><release note 2></li>
+        </ul>
+    ]]></description>
     <enclosure
         url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/vX.Y.Z/TangoDisplay-vX.Y.Z-universal.zip"
         sparkle:edSignature="<signature from sign_update>"

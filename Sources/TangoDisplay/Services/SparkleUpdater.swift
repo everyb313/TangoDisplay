@@ -14,4 +14,8 @@ final class SparkleUpdater: ObservableObject {
     func checkForUpdates() {
         controller.checkForUpdates(nil)
     }
+
+    func checkForUpdatesInBackground() {
+        controller.updater.checkForUpdatesInBackground()
+    }
 }

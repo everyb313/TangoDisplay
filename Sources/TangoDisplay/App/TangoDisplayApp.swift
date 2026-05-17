@@ -5,6 +5,7 @@ struct TangoDisplayApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var appState = AppState()
     @StateObject private var sparkleUpdater = SparkleUpdater()
+    @State private var hasAutoChecked = false
 
     init() {
         // Wire the delegate's appState reference before applicationDidFinishLaunching fires.
@@ -22,6 +23,14 @@ struct TangoDisplayApp: App {
                     // Pass appState to the delegate (cannot be done in init because
                     // @StateObject is not available until the first render)
                     appDelegate.appState = appState
+                }
+                .onChange(of: appState.versionChecker.updateAvailable) { isAvailable in
+                    guard isAvailable, !hasAutoChecked else { return }
+                    hasAutoChecked = true
+                    Task {
+                        try? await Task.sleep(for: .seconds(3))
+                        sparkleUpdater.checkForUpdatesInBackground()
+                    }
                 }
         }
         .defaultSize(width: 700, height: 540)
