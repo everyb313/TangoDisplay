@@ -59,7 +59,7 @@ Each row shows:
 |---|---|
 | State icon | Waveform = playing · Pause = paused/armed · Checkmark = played · Play = next up |
 | Title & Artist | Extracted from the audio file's tags |
-| Genre tag | Colour-coded: green = playing, orange = paused, blue = next to play, grey = queued/played |
+| Genre tag | Colour-coded: green = playing, orange = paused, blue = next to play, grey = queued/played. Custom colours can be assigned to upcoming tracks by genre keyword (see Genre Colours below). |
 | Year | Optional — toggle in Player Settings |
 | Duration | Optional — toggle in Player Settings |
 | Comments / Album Artist | Optional — toggle in Player Settings |
@@ -521,6 +521,35 @@ Toggles for which fields appear in setlist rows (visible only with Built-in Play
 | Time | On | Shows duration and current position |
 | Comments | Off | |
 | Album Artist | Off | |
+
+### Genre Colours
+
+Assign custom colours to genre tags for upcoming (unplayed) tracks — giving a clear visual map of the tanda structure ahead.
+
+**Enable/disable:** Toggle **Genre tag colours** in **Settings › Player › Genre Colours**.
+
+**Adding a rule:**
+
+1. Type a keyword in the text field (e.g. `tango`)
+2. Pick a colour with the colour picker
+3. Click **Add**
+
+Keywords are case-insensitive and match anywhere in the genre name — `tango` matches `Tango`, `Argentine Tango`, `Tango Nuevo`, etc.
+
+**Colour priority:**
+
+| Track state | Genre tag colour |
+|---|---|
+| Playing | Green (always) |
+| Paused (armed) | Orange (always) |
+| Next to play | Accent blue (always) |
+| Already played | Grey (always) |
+| Upcoming / queued — keyword match | Your custom colour |
+| Upcoming / queued — no match | Grey |
+
+Custom colours apply only to tracks that have not yet been played and are not currently playing — the tanda structure is visible at a glance without interfering with standard playback indicators.
+
+To remove a custom colour, click the **trash** icon next to the rule. The genre tag reverts to standard grey for upcoming tracks.
 
 ### Track Info Transformations
 

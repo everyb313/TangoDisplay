@@ -5,6 +5,12 @@ import TangoDisplayCore
 
 private let kPrefix = "TangoDisplay."
 
+struct GenreColorRule: Codable, Identifiable, Equatable {
+    var id: UUID = UUID()
+    var keyword: String
+    var colorHex: String
+}
+
 /// All user-configurable settings, persisted to UserDefaults.
 /// Arrays are stored as comma-joined strings to avoid UserDefaults type-registration issues.
 final class AppSettings: ObservableObject {
@@ -166,6 +172,16 @@ final class AppSettings: ObservableObject {
     @Published var showAlbumArtist: Bool {
         didSet { UserDefaults.standard.set(showAlbumArtist, forKey: kPrefix + "showAlbumArtist") }
     }
+    @Published var genreColorsEnabled: Bool {
+        didSet { UserDefaults.standard.set(genreColorsEnabled, forKey: kPrefix + "genreColorsEnabled") }
+    }
+    @Published var genreColorRules: [GenreColorRule] {
+        didSet {
+            if let data = try? JSONEncoder().encode(genreColorRules) {
+                UserDefaults.standard.set(data, forKey: kPrefix + "genreColorRules")
+            }
+        }
+    }
 
     // MARK: - Appearance / presentation
 
@@ -275,6 +291,13 @@ final class AppSettings: ObservableObject {
         showTime = ud.object(forKey: kPrefix + "showTime").flatMap { $0 as? Bool } ?? true
         showComments = ud.object(forKey: kPrefix + "showComments").flatMap { $0 as? Bool } ?? false
         showAlbumArtist = ud.object(forKey: kPrefix + "showAlbumArtist").flatMap { $0 as? Bool } ?? false
+        genreColorsEnabled = ud.object(forKey: kPrefix + "genreColorsEnabled").flatMap { $0 as? Bool } ?? false
+        if let data = ud.data(forKey: kPrefix + "genreColorRules"),
+           let rules = try? JSONDecoder().decode([GenreColorRule].self, from: data) {
+            genreColorRules = rules
+        } else {
+            genreColorRules = []
+        }
         if let idString = ud.string(forKey: kPrefix + "activeProfileID") {
             activeProfileID = UUID(uuidString: idString)
         } else {

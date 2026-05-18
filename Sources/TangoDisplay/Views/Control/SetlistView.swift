@@ -177,7 +177,9 @@ struct SetlistView: View {
                     showAlbumArtist: settings.showAlbumArtist,
                     wouldSkipAutoGap: wouldSkipAutoGap,
                     autoFadeCortinasEnabled: settings.autoFadeCortinasEnabled,
-                    isLastTanda: entry.isLastTanda
+                    isLastTanda: entry.isLastTanda,
+                    genreColorsEnabled: settings.genreColorsEnabled,
+                    genreColorRules: settings.genreColorRules
                 )
                 .tag(entry.id)
                 .moveDisabled(entry.state == .playing)
@@ -642,6 +644,8 @@ struct SetlistRowView: View {
     var wouldSkipAutoGap: Bool = false
     var autoFadeCortinasEnabled: Bool = false
     var isLastTanda: Bool = false
+    var genreColorsEnabled: Bool = false
+    var genreColorRules: [GenreColorRule] = []
 
     private var isCurrent: Bool { entry.state == .playing || entry.state == .paused || isActivelyPlaying }
     private var isCurrentPlaying: Bool { entry.state == .playing || isActivelyPlaying }
@@ -723,6 +727,13 @@ struct SetlistRowView: View {
         if isNextToPlay { return .accentColor }
         if isCurrent && isCurrentPlaying { return .green }
         if isCurrent && entry.state == .paused { return .orange }
+        if entry.state == .queued && genreColorsEnabled {
+            if let rule = genreColorRules.first(where: {
+                entry.track.genre.localizedCaseInsensitiveContains($0.keyword)
+            }) {
+                return Color(hex: rule.colorHex)
+            }
+        }
         return .secondary
     }
 

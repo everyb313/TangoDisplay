@@ -241,6 +241,19 @@ struct PlayerSettingsView: View {
                     Text("Track Info")
                         .foregroundColor(ControlTheme.accent)
                 }
+
+                Section {
+                    Toggle("Genre tag colours", isOn: $settings.genreColorsEnabled)
+                    Text("Colour upcoming (unplayed) tracks by genre keyword. Keywords are case-insensitive and match anywhere in the genre name. Playing, paused, and already-played tracks are unaffected.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    if settings.genreColorsEnabled {
+                        GenreColourRulesEditor(rules: $settings.genreColorRules)
+                    }
+                } header: {
+                    Text("Genre Colours")
+                        .foregroundColor(ControlTheme.accent)
+                }
             }
         }
         .formStyle(.grouped)

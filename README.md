@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.16.2-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.16.3-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,9 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.16.3
+- Add customisable genre tag colours to the Setlist player. Assign a colour to any genre keyword — keywords match case-insensitively and partially (e.g. "tango" matches "Argentine Tango"). Colours apply only to upcoming unplayed tracks; playing, paused, and already-played tracks keep their standard colours.
 
 ### v3.16.2
 - Setlist status bar: added "Next cortina" countdown showing time until the next cortina
