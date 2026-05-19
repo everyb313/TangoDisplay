@@ -10,12 +10,12 @@ TangoDisplay includes a native audio player that lets you manage and play your m
 
 1. Click the display icon in the menu bar › **Show Settings Window**
 2. Go to **Player** in the sidebar
-3. Under **Player Source**, select **Built-in Player**
+3. Under **Player Source**, select **Setlist (Built-In Player)** — it appears at the top of the list, marked **Recommended**
 4. Switch to the **Setlist** tab to build your setlist
 
 Once the built-in player is active, you can jump straight to the Setlist tab at any time from the menu bar: click the display icon › **Show Setlist**.
 
-> **Screenshot placeholder:** Player Settings view with Built-in Player selected
+> **Screenshot placeholder:** Player Settings view with Setlist (Built-In Player) selected
 
 ---
 

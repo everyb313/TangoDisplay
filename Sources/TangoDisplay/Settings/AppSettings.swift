@@ -263,7 +263,7 @@ final class AppSettings: ObservableObject {
             denylistLabelOverrides = [:]
         }
         let rawPlayer = ud.string(forKey: kPrefix + "selectedPlayer") ?? ""
-        selectedPlayer = MusicPlayerChoice(rawValue: rawPlayer) ?? .musicApp
+        selectedPlayer = MusicPlayerChoice(rawValue: rawPlayer) ?? .builtIn
         jriverZoneID = ud.object(forKey: kPrefix + "jriverZoneID").flatMap { $0 as? Int } ?? -1
         builtInVolume = ud.object(forKey: kPrefix + "builtInVolume").flatMap { $0 as? Float } ?? 1.0
         builtInBalance = ud.object(forKey: kPrefix + "builtInBalance").flatMap { $0 as? Float } ?? 0.0

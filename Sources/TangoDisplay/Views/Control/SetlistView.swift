@@ -371,15 +371,17 @@ struct SetlistView: View {
                 selectedIDs.subtract(targets)
             }
         }
-        if targets.count == 1, let id = targets.first {
+        if targets.count == 1, let id = targets.first,
+           let e = setlist.entries.first(where: { $0.id == id }) {
             Divider()
-            Button {
-                setlist.stopAfterEntryID = (setlist.stopAfterEntryID == id) ? nil : id
-            } label: {
-                Text(setlist.stopAfterEntryID == id ? "Resume after Playing" : "Stop after Playing")
+            if e.state != .played {
+                Button {
+                    setlist.stopAfterEntryID = (setlist.stopAfterEntryID == id) ? nil : id
+                } label: {
+                    Text(setlist.stopAfterEntryID == id ? "Resume after Playing" : "Stop after Playing")
+                }
             }
-            if let e = setlist.entries.first(where: { $0.id == id }),
-               e.state == .queued || e.state == .paused {
+            if e.state == .queued || e.state == .paused {
                 Button(e.ignoresAutoGap ? "Resume Auto-gap" : "Ignore Auto-gap before this Track") {
                     setlist.toggleIgnoresAutoGap(id: id)
                 }

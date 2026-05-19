@@ -142,23 +142,27 @@ final class SetlistManager: ObservableObject {
                 entries[i].state = .played
             }
         }
+        save()
     }
 
     func markPaused(id: UUID) {
         if let i = entries.firstIndex(where: { $0.id == id }) {
             entries[i].state = .paused
+            save()
         }
     }
 
     func markQueued(id: UUID) {
         if let i = entries.firstIndex(where: { $0.id == id }) {
             entries[i].state = .queued
+            save()
         }
     }
 
     func markPlayed(id: UUID) {
         if let i = entries.firstIndex(where: { $0.id == id }) {
             entries[i].state = .played
+            save()
         }
     }
 

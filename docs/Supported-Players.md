@@ -12,7 +12,7 @@ TangoDisplay supports five player sources. Select your player in **Settings › 
 | **Swinsian** | Push notifications | ✓ | — | ✓ | ✓ | ✓ | ✓ |
 | **Embrace** | Notifications + AppleScript | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | **JRiver Media Center** | MCWS HTTP API (2 s poll) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Built-in Player** | Native (fully integrated) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **Setlist (Built-In Player)** | Native (fully integrated) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 **Tanda position** — shows "Track 2" (position within the current tanda, derived from track history or playlist).  
 **Tanda total** — shows "of 4" (total tracks in the tanda, requires backward playlist context). Swinsian's queue starts at the current track, so this is unavailable.  
@@ -57,7 +57,7 @@ Polls JRiver's MCWS HTTP API at `127.0.0.1:52199` every 2 seconds. Full playlist
 
 ---
 
-### Built-in Player
+### Setlist (Built-In Player)
 
 TangoDisplay plays audio directly — no external player required. Build a setlist by dragging tracks from Finder, Music.app, or Swinsian. All display automation (cortina detection, tanda counting, coming-up preview, artwork) is fully integrated. Additional features: 5-band EQ, audio output routing, Fade & Stop / Fade & Continue cortina transitions, auto-fade cortinas, and accidental-stop protection.
 

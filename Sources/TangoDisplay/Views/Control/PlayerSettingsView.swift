@@ -13,23 +13,38 @@ struct PlayerSettingsView: View {
     var body: some View {
         Form {
             Section {
-                Picker("Music player", selection: Binding(
-                    get: { settings.selectedPlayer },
-                    set: { newChoice in
-                        guard newChoice != settings.selectedPlayer else { return }
-                        if settings.selectedPlayer == .builtIn && !appState.setlist.entries.isEmpty {
-                            pendingPlayerChoice = newChoice
-                            showClearSetlistAlert = true
-                        } else {
-                            settings.selectedPlayer = newChoice
+                VStack(alignment: .leading, spacing: 5) {
+                    ForEach(MusicPlayerChoice.allCases) { choice in
+                        HStack(spacing: 6) {
+                            Image(systemName: settings.selectedPlayer == choice
+                                  ? "largecircle.fill.circle" : "circle")
+                                .foregroundStyle(settings.selectedPlayer == choice
+                                                 ? Color.accentColor : Color.secondary)
+                                .font(.system(size: 13))
+                            Text(choice.displayName)
+                            if choice == .builtIn {
+                                Text("Recommended")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.accentColor)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.accentColor.opacity(0.15))
+                                    .clipShape(Capsule())
+                            }
+                        }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            let newChoice = choice
+                            guard newChoice != settings.selectedPlayer else { return }
+                            if settings.selectedPlayer == .builtIn && !appState.setlist.entries.isEmpty {
+                                pendingPlayerChoice = newChoice
+                                showClearSetlistAlert = true
+                            } else {
+                                settings.selectedPlayer = newChoice
+                            }
                         }
                     }
-                )) {
-                    ForEach(MusicPlayerChoice.allCases) { choice in
-                        Text(choice.displayName).tag(choice)
-                    }
                 }
-                .pickerStyle(.radioGroup)
                 .alert("Clear Setlist?", isPresented: $showClearSetlistAlert) {
                     Button("Switch Player", role: .destructive) {
                         if let choice = pendingPlayerChoice {

@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.16.6-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.16.7-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,13 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.16.7
+- Built-in player renamed "Setlist (Built-In Player)" — appears first in the player list and is now the default for fresh installs, with a "Recommended" badge in Settings › Player
+- Cortina denylist editor redesigned as a cleaner three-column layout (Genre | Display label | Controls)
+- Setlist state (paused, queued, played) now persists to disk immediately
+- Context menu now shows only relevant options depending on track state
+- Removed unused "Last Tanda Label" colour setting from Appearance › Colours
 
 ### v3.16.6
 - ⌘V paste now works with Foobar2000 — copy tracks with ⌘C in Foobar2000 and paste them directly into the Setlist panel

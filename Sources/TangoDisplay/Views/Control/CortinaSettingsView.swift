@@ -101,52 +101,76 @@ struct CortinaSettingsView: View {
 
     private func denylistEditor() -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            ForEach(settings.denylistGenres.indices, id: \.self) { idx in
-                let genre = settings.denylistGenres[idx]
-                HStack(spacing: 12) {
-                    Text(genre)
-                        .font(.system(size: 13))
-                        .frame(width: 100, alignment: .leading)
-                    TextField(text: Binding(
-                        get: { settings.denylistLabelOverrides[genre] ?? "" },
-                        set: { newValue in
-                            let v = newValue.trimmingCharacters(in: .whitespaces)
-                            if v.isEmpty {
-                                settings.denylistLabelOverrides.removeValue(forKey: genre)
-                            } else {
-                                settings.denylistLabelOverrides[genre] = v
-                            }
-                        }
-                    ), prompt: Text("e.g. Your label").foregroundColor(.secondary)) {
-                        EmptyView()
+            HStack(alignment: .top, spacing: 12) {
+                // Column 1: Genre
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Genre")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    ForEach(settings.denylistGenres.indices, id: \.self) { idx in
+                        Text(settings.denylistGenres[idx])
+                            .font(.system(size: 13))
+                            .frame(height: 22)
                     }
-                    .textFieldStyle(.roundedBorder)
-                    .font(.system(size: 13))
-                    .frame(width: 160)
-                    Spacer()
-                    Toggle("Partial match", isOn: Binding(
-                        get: { settings.denylistPartialMatchGenres.contains(genre) },
-                        set: { enabled in
-                            if enabled {
-                                settings.denylistPartialMatchGenres.insert(genre)
-                            } else {
-                                settings.denylistPartialMatchGenres.remove(genre)
-                            }
-                        }
-                    ))
-                    .toggleStyle(.checkbox)
-                    .fixedSize()
-                    .help("Also matches genres containing \"\(genre)\" anywhere (e.g. \"\(genre) Instrumental\", \"Alt \(genre)\")")
-                    Button {
-                        settings.denylistGenres.remove(at: idx)
-                    } label: {
-                        Image(systemName: "trash")
-                    }
-                    .buttonStyle(.plain)
                 }
-                .padding(.horizontal, 6)
-                .padding(.vertical, 6)
+
+                // Column 2: Display label — fills available width
+                VStack(alignment: .trailing, spacing: 6) {
+                    Text("Display label")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    ForEach(settings.denylistGenres.indices, id: \.self) { idx in
+                        let genre = settings.denylistGenres[idx]
+                        TextField(text: Binding(
+                            get: { settings.denylistLabelOverrides[genre] ?? "" },
+                            set: { newValue in
+                                let v = newValue.trimmingCharacters(in: .whitespaces)
+                                if v.isEmpty {
+                                    settings.denylistLabelOverrides.removeValue(forKey: genre)
+                                } else {
+                                    settings.denylistLabelOverrides[genre] = v
+                                }
+                            }
+                        ), prompt: Text("e.g. Your label").foregroundColor(.secondary)) {
+                            EmptyView()
+                        }
+                        .textFieldStyle(.roundedBorder)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                // Column 3: Controls
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("").font(.caption) // height spacer matching header row
+                    ForEach(settings.denylistGenres.indices, id: \.self) { idx in
+                        let genre = settings.denylistGenres[idx]
+                        HStack(spacing: 8) {
+                            Toggle("Partial match", isOn: Binding(
+                                get: { settings.denylistPartialMatchGenres.contains(genre) },
+                                set: { enabled in
+                                    if enabled {
+                                        settings.denylistPartialMatchGenres.insert(genre)
+                                    } else {
+                                        settings.denylistPartialMatchGenres.remove(genre)
+                                    }
+                                }
+                            ))
+                            .toggleStyle(.checkbox)
+                            .fixedSize()
+                            .help("Also matches genres containing \"\(genre)\" anywhere (e.g. \"\(genre) Instrumental\", \"Alt \(genre)\")")
+                            Button {
+                                settings.denylistGenres.remove(at: idx)
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .frame(height: 22)
+                    }
+                }
             }
+            .padding(.horizontal, 6)
+
             HStack {
                 TextField("e.g. Tango", text: $newDenylistGenre)
                     .textFieldStyle(.roundedBorder)
