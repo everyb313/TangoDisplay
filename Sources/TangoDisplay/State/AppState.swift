@@ -104,6 +104,7 @@ final class AppState: ObservableObject {
         case .swinsian: return SwinsianMonitor()
         case .embrace:  return EmbracMonitor()
         case .jriver:   return JRiverPoller(zoneID: settings.jriverZoneID)
+        case .megaSeg:  return MegaSegMonitor()
         case .builtIn:  return LocalPlayerSource(setlist: setlist, settings: settings, volume: settings.builtInVolume)
         }
     }

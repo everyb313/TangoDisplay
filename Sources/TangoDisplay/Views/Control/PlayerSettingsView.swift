@@ -31,6 +31,15 @@ struct PlayerSettingsView: View {
                                     .background(Color.accentColor.opacity(0.15))
                                     .clipShape(Capsule())
                             }
+                            if choice == .megaSeg {
+                                Text("Beta")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.orange)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.15))
+                                    .clipShape(Capsule())
+                            }
                         }
                         .contentShape(Rectangle())
                         .onTapGesture {
@@ -348,6 +357,34 @@ struct PlayerSettingsView: View {
                 }
                 Label {
                     Text("If you use multiple zones (e.g. Player + Prelistening), use the Zone picker below to pin TangoDisplay to a specific zone.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } icon: {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.secondary)
+                }
+            }
+
+        case .megaSeg:
+            VStack(alignment: .leading, spacing: 8) {
+                Label {
+                    Text("Listens for MegaSeg track-change notifications and reads NowPlaying files in real time. Upcoming tracks are available via ComingUp.html.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } icon: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.green)
+                }
+                Label {
+                    Text("Pre-listen/cue deck activity does not affect the display — only the main program output (what the audience hears) is shown. Pause detection is not available.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } icon: {
+                    Image(systemName: "info.circle")
+                        .foregroundColor(.secondary)
+                }
+                Label {
+                    Text("Requires MegaSeg v5.9.4 or later. Genre is looked up from MegaSeg's library database; tracks not found there fall back to your Music.app library.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } icon: {

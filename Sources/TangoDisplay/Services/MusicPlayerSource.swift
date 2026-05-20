@@ -10,6 +10,7 @@ enum MusicPlayerChoice: String, CaseIterable, Identifiable {
     case swinsian  = "swinsian"
     case embrace   = "embrace"
     case jriver    = "jriver"
+    case megaSeg   = "megaSeg"
 
     var id: String { rawValue }
 
@@ -20,6 +21,7 @@ enum MusicPlayerChoice: String, CaseIterable, Identifiable {
         case .swinsian: return "Swinsian"
         case .embrace:  return "Embrace"
         case .jriver:   return "JRiver Media Center"
+        case .megaSeg:  return "MegaSeg"
         }
     }
 }

@@ -1,6 +1,6 @@
 # Supported Players
 
-TangoDisplay supports five player sources. Select your player in **Settings › Player**.
+TangoDisplay supports six player sources. Select your player in **Settings › Player**.
 
 ---
 
@@ -12,6 +12,7 @@ TangoDisplay supports five player sources. Select your player in **Settings › 
 | **Swinsian** | Push notifications | ✓ | — | ✓ | ✓ | ✓ | ✓ |
 | **Embrace** | Notifications + AppleScript | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | **JRiver Media Center** | MCWS HTTP API (2 s poll) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **MegaSeg Pro** *(Beta)* | NowPlaying logs + notifications | ✓ | — | ✓ (queue only) | ✓ | — | — |
 | **Setlist (Built-In Player)** | Native (fully integrated) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 
 **Tanda position** — shows "Track 2" (position within the current tanda, derived from track history or playlist).  
@@ -54,6 +55,22 @@ Polls JRiver's MCWS HTTP API at `127.0.0.1:52199` every 2 seconds. Full playlist
 **Requirements:** JRiver Media Center must be running with **Media Network** enabled (Tools → Options → Media Network → Enable Media Network). No additional configuration is needed — TangoDisplay connects to localhost on the default MCWS port.
 
 **Multiple zones:** If you run more than one JRiver zone (e.g. Player + Prelistening), go to **Settings › Player › Zone** and pick the zone TangoDisplay should monitor. Click **Refresh** to populate the list from JRiver, then select your main output zone. The pre-listening zone will be ignored. Defaults to *Active (follows current)*, which preserves the previous single-zone behaviour.
+
+---
+
+### MegaSeg Pro *(Beta)*
+
+Listens for the `com.fidelitymedia.MegaSeg.nowPlaying` distributed notification (MegaSeg v5.9.4+) and polls every 2 seconds as a fallback. Track data is read from MegaSeg's NowPlaying log files (`~/Music/MegaSeg/Logs/`). Genre is sourced from MegaSeg's own library database (`~/Music/MegaSeg/Library/MegaSeg Database`), with iTunes Library.xml as a secondary fallback.
+
+**Important workflow constraints:**
+- The display updates only when a track starts on MegaSeg's **program (main) output** — the audio the audience hears. Pre-listening via the cue deck (headphones) never affects the display.
+- Playlist look-ahead and the coming-up cortina preview are only available when playing from a **loaded MegaSeg queue or playlist**. Playing tracks ad-hoc from the library shows no upcoming tracks.
+- Tanda counting ("Track 2 of 4") requires a loaded playlist for the total; the tanda position counter is always available.
+- Artwork is read from `NowPlaying.jpg` written by MegaSeg.
+
+**Requirements:** MegaSeg Pro must be running. MegaSeg v5.9.4 or later is recommended for push notification support; older versions fall back to 2-second polling.
+
+> This integration is marked **Beta** — real-world DJ workflows with MegaSeg vary widely. Please test and [report any issues](https://github.com/richardsladetdj-creator/TangoDisplay/issues).
 
 ---
 

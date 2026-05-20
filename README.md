@@ -26,7 +26,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 - **Album Artwork** — display the current track's artwork on the dancer screen; enable per context (dance tracks, cortinas, or both) with configurable opacity, scale, and position. Supported for Music.app, Swinsian, and Embrace.
 - **Singer line** — display the vocalist name; choose the source — **Comments** or **Album Artist** — via the Singer Source picker in Appearance. Configurable font and color. Enable per context (dance tracks, cortinas, or both). Supported for Music.app, Swinsian, and Embrace.
 - **Text order** — drag items into any order you like for three independent sections — dance-track display, cortina track display, and the cortina "Coming Up" preview — per appearance profile
-- **Player Source** — choose Music.app (default), Swinsian (real-time notifications; queue-based look-ahead), Embrace (full playlist lookahead and tanda counting via AppleScript), JRiver Media Center (MCWS HTTP API; full playlist lookahead and tanda counting; zone selection lets you pin TangoDisplay to a specific zone so a pre-listening zone never affects the display), or the Built-in Player. See [Supported Players](https://github.com/richardsladetdj-creator/TangoDisplay/wiki/Supported-Players) for a full feature matrix.
+- **Player Source** — choose Music.app (default), Swinsian (real-time notifications; queue-based look-ahead), Embrace (full playlist lookahead and tanda counting via AppleScript), JRiver Media Center (MCWS HTTP API; full playlist lookahead and tanda counting; zone selection lets you pin TangoDisplay to a specific zone so a pre-listening zone never affects the display), MegaSeg Pro (Beta; reads program-deck output via NowPlaying logs; genre from MegaSeg's library database), or the Built-in Player. See [Supported Players](https://github.com/richardsladetdj-creator/TangoDisplay/wiki/Supported-Players) for a full feature matrix.
 - **Update indicator** — a small dot in the sidebar shows when a newer release is available; click to open the releases page
 
 ---
@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.17.0-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.18.0-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,11 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.18.0
+- **MegaSeg integration (Beta)** — TangoDisplay can now monitor MegaSeg Pro as a player source. Select MegaSeg in Settings › Player to enable. Genre is looked up from MegaSeg's own library database, with Music.app's iTunes Library as a fallback.
+- **MegaSeg workflow notes:** The display updates only when a track starts on MegaSeg's program (main) output — the track that the audience hears. Pre-listening in the cue deck (headphones) never affects the display. Playlist look-ahead (upcoming tanda preview) is only available when playing from a loaded MegaSeg queue; ad-hoc plays from the library show no upcoming tracks. Tanda counting requires a loaded playlist. Requires MegaSeg v5.9.4 or later.
+- **Please test and report results** — this integration is marked Beta because real-world DJ workflows with MegaSeg vary widely. If you use MegaSeg, please try it and report any issues.
 
 ### v3.17.0
 - **Setlist Reports** — Export any setlist as a self-contained HTML report with genre breakdown charts, top-track ranking, per-tanda summaries, and an interactive searchable track table. Save reports from the Share menu in the Setlist tab; open, combine, and export from the new Reports tab in the sidebar.
