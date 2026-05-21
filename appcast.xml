@@ -4,6 +4,23 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 3.19.1</title>
+            <pubDate>Thu, 22 May 2026 12:00:00 +0000</pubDate>
+            <sparkle:version>65</sparkle:version>
+            <sparkle:shortVersionString>3.19.1</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li>Fix: Singer from Grouping field now correctly shown in the upcoming-track display during cortinas when using the Embrace player</li>
+                    <li>Fix: Grouping tag now shown in Setlist for tracks added before the Grouping feature was introduced (one-time metadata refresh on first launch)</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.19.1/TangoDisplay-v3.19.1-universal.zip"
+                sparkle:edSignature="jFmInYqk0tBOmGRvAeKyIh4IOFhTBYfqj7Qand0GcvMtvE101BIzp+mq3UxvMmqAfEDSGF0lzo+S2Mje6AhEBA=="
+                length="5246439"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.19.0</title>
             <pubDate>Wed, 21 May 2026 12:00:00 +0000</pubDate>
             <sparkle:version>64</sparkle:version>
