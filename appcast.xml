@@ -4,6 +4,23 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 3.18.4</title>
+            <pubDate>Wed, 21 May 2026 12:00:00 +0000</pubDate>
+            <sparkle:version>63</sparkle:version>
+            <sparkle:shortVersionString>3.18.4</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li>macOS Tahoe (26.x) compatibility: menu bar icon migrated from deprecated NSStatusItem to MenuBarExtra</li>
+                    <li>Sparkle updated to 2.9.2 for Tahoe update-alert compatibility</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.18.4/TangoDisplay-v3.18.4-universal.zip"
+                sparkle:edSignature="K6XVANLv7/EWBxTIKR9eDMQNn0NeGXanBMVfv055BGTzBtX8tdBE3xQGoXAveCKNY+9TxtED2WU61UGdQo2BCw=="
+                length="5174410"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.18.3</title>
             <pubDate>Thu, 22 May 2026 12:00:00 +0000</pubDate>
             <sparkle:version>62</sparkle:version>
