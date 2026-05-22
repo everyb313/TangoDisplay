@@ -40,6 +40,7 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
 
     @Published private(set) var replayGainStatus: String = ""
     @Published private(set) var hogModeConflict: Bool = false
+    @Published private(set) var hogDeviceStolenAlert: Bool = false
     @Published private(set) var isChangingDevice: Bool = false
 
     // MARK: - Private — audio engine
@@ -136,25 +137,63 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
     @objc private func handleEngineConfigChange() {
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
+            // Graph rewire must happen with engine stopped; engine is already stopped when this fires.
             if self.audioFile != nil {
                 self.connectAudioGraph(format: self.audioFile?.processingFormat)
             }
-            // Engine is already stopped by the system when this notification fires, so it is
-            // safe to set the output device property before restarting — this re-asserts the
-            // user's chosen device so a plug event (e.g. headphones) doesn't silently redirect audio.
-            if let audioUnit = self.audioEngine.outputNode.audioUnit {
-                self.setOutputDeviceProperty(audioUnit: audioUnit, uid: self.settings.builtInOutputDeviceUID)
-            }
-            do {
-                try self.audioEngine.start()
-                self.levelMeter.reinstallTap()
-                self.applyBalance(self._balance)
-                if self.audioFile != nil {
-                    self.seekTo(self.elapsed)
-                    if self.isActivePlaying { self.playerNode.play() }
+
+            // Capture all state before leaving the main thread.
+            guard let audioUnit = self.audioEngine.outputNode.audioUnit else { return }
+            let uid = self.settings.builtInOutputDeviceUID
+            let hogEnabled = self.settings.builtInHogMode
+            let wasPlaying = self.isActivePlaying
+            let savedElapsed = self.elapsed
+
+            // Dispatch blocking CoreAudio work off the main thread to avoid a UI spinner.
+            self.audioDeviceQueue.async { [weak self] in
+                guard let self else { return }
+
+                // Re-assert the user's chosen output device before restarting.
+                self.setOutputDeviceProperty(audioUnit: audioUnit, uid: uid)
+
+                // Detect hog-mode theft by another process.
+                let deviceStolenByOther: Bool
+                if !uid.isEmpty && !hogEnabled {
+                    let owner = AudioDeviceManager.hogOwner(forUID: uid)
+                    deviceStolenByOther = owner != -1 && owner != getpid()
+                } else {
+                    deviceStolenByOther = false
                 }
-            } catch {
-                os_log(.error, "TangoDisplay: engine restart failed: %{public}@", error.localizedDescription)
+
+                if deviceStolenByOther && wasPlaying {
+                    self.playerNode.stop()
+                }
+
+                do {
+                    try self.audioEngine.start()
+                } catch {
+                    os_log(.error, "TangoDisplay: engine restart failed: %{public}@", error.localizedDescription)
+                }
+
+                DispatchQueue.main.async {
+                    if deviceStolenByOther {
+                        self.hogModeConflict = true
+                        if wasPlaying {
+                            self.isActivePlaying = false
+                            self.reportCurrentState()
+                            self.hogDeviceStolenAlert = true
+                            // Pulse back to false so future interruptions can re-trigger the alert.
+                            DispatchQueue.main.async { self.hogDeviceStolenAlert = false }
+                        }
+                    } else {
+                        self.levelMeter.reinstallTap()
+                        self.applyBalance(self._balance)
+                        if self.audioFile != nil {
+                            self.seekTo(savedElapsed)
+                            if wasPlaying { self.playerNode.play() }
+                        }
+                    }
+                }
             }
         }
     }

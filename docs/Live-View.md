@@ -66,6 +66,33 @@ Turning the toggle off immediately clears the label from the display.
 
 ---
 
+## Focus Mode
+
+Focus Mode combines the live preview and setlist into a single split-pane window — useful when you want everything on one screen during a performance.
+
+**Open / close:** Click the Focus Mode button in the toolbar (⌘⇧F).
+
+### Layout
+
+- **Top pane** — 16:9 live preview of the dancer display. An optional controls panel (200 px wide) sits to the right of the preview.
+- **Divider** — drag the divider strip to resize the top and bottom panes. The split position is remembered between sessions.
+- **Bottom pane** — the full Setlist view, including player controls and track list. Requires Built-in Player to be active; if another player source is selected, a prompt offers to switch.
+
+### Controls panel
+
+The controls panel (toggle with the rectangle toolbar button, or hide it to maximise preview space) contains:
+
+| Button | What it does |
+|---|---|
+| **Force Poll** | Immediately triggers a re-read from the current player source |
+| **Override…** | Opens the manual display override dialog |
+| **Pause Display / Unpause Display** | Freezes or resumes live updates on the dancer screen |
+| **Last Tanda** | Activates/deactivates the Last Tanda label |
+
+> Focus Mode requires the Built-in Player to be active for the setlist panel. The preview and controls panel work with any player source.
+
+---
+
 ## Track info panel
 
 Below the buttons, TangoDisplay shows the currently detected values:

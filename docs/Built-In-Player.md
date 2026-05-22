@@ -454,6 +454,7 @@ Enable **Exclusive mode (Hog Mode)** in **Player Settings** to give TangoDisplay
 
 - The toggle is only available when a specific output device is selected (not the system default).
 - If another process already owns the device when you enable Hog Mode, an orange warning banner appears in the Setlist view with a **Retry** button. Once the other app releases its hold, tap Retry to acquire exclusive access.
+- If another app claims the device *while a track is playing*, a **Playback Interrupted** alert appears. Click **Retry** to re-acquire exclusive access and resume playback, or **OK** to continue without exclusive mode.
 - Hog Mode is released automatically when TangoDisplay quits or you switch back to the system default output.
 
 ---

@@ -60,9 +60,12 @@ struct ControlView: View {
     @State private var pendingSelection: SidebarItem? = nil
     @State private var showingUnsavedChangesAlert = false
     @State private var showingOverride = false
+    @AppStorage("focusMode") private var focusMode: Bool = false
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var preFocusSelectedItem: SidebarItem? = nil
 
     var body: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             sidebar
         } detail: {
             detail
@@ -84,6 +87,7 @@ struct ControlView: View {
         }
         .background(ControlWindowAccessor())
         .onAppear {
+            focusMode = false
             WindowManager.ensureOpen(openWindow: openWindow)
             appState.reopenPresentationWindow = { openWindow(id: "presentation") }
             if let displayID = appState.settings.targetDisplayID {
@@ -110,6 +114,32 @@ struct ControlView: View {
             NotificationCenter.default.publisher(for: .navigateToSetlist)
         ) { _ in
             selectedItem = .setlist
+        }
+        .toolbar {
+            ToolbarItem {
+                Button {
+                    focusMode.toggle()
+                } label: {
+                    Label(focusMode ? "Exit Focus" : "Focus Mode",
+                          systemImage: focusMode ? "eye.fill" : "eye")
+                }
+                .keyboardShortcut("f", modifiers: [.command, .shift])
+                .help(focusMode ? "Exit Focus Mode (⌘⇧F)" : "Focus Mode: setlist + live preview (⌘⇧F)")
+            }
+        }
+        .onChange(of: focusMode) { newValue in
+            if newValue {
+                preFocusSelectedItem = selectedItem
+                columnVisibility = .detailOnly
+            } else {
+                columnVisibility = .all
+                selectedItem = preFocusSelectedItem
+            }
+        }
+        .onChange(of: columnVisibility) { newValue in
+            if newValue != .detailOnly && focusMode {
+                focusMode = false
+            }
         }
     }
 
@@ -168,35 +198,39 @@ struct ControlView: View {
 
     @ViewBuilder
     private var detail: some View {
-        switch selectedItem {
-        case .live, .none:
-            liveView
-        case .setlist:
-            setlistView
-        case .reports:
-            SetlistReportingView()
-        case .cortinaRules:
-            CortinaSettingsView()
-                .environmentObject(appState)
-                .environmentObject(appState.settings)
-        case .appearance:
-            AppearanceSettingsView()
-                .environmentObject(appState)
-                .environmentObject(appState.settings)
-        case .display:
-            DisplaySettingsView()
-                .environmentObject(appState)
-                .environmentObject(appState.settings)
-        case .player:
-            PlayerSettingsView()
-                .environmentObject(appState)
-                .environmentObject(appState.settings)
-        case .advanced:
-            AdvancedSettingsView()
-                .environmentObject(appState.settings)
-        case .profiles:
-            ProfilesView()
-                .environmentObject(appState.settings)
+        if focusMode {
+            FocusModeView()
+        } else {
+            switch selectedItem {
+            case .live, .none:
+                liveView
+            case .setlist:
+                setlistView
+            case .reports:
+                SetlistReportingView()
+            case .cortinaRules:
+                CortinaSettingsView()
+                    .environmentObject(appState)
+                    .environmentObject(appState.settings)
+            case .appearance:
+                AppearanceSettingsView()
+                    .environmentObject(appState)
+                    .environmentObject(appState.settings)
+            case .display:
+                DisplaySettingsView()
+                    .environmentObject(appState)
+                    .environmentObject(appState.settings)
+            case .player:
+                PlayerSettingsView()
+                    .environmentObject(appState)
+                    .environmentObject(appState.settings)
+            case .advanced:
+                AdvancedSettingsView()
+                    .environmentObject(appState.settings)
+            case .profiles:
+                ProfilesView()
+                    .environmentObject(appState.settings)
+            }
         }
     }
 

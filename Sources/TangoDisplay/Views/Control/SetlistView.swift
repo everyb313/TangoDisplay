@@ -48,6 +48,7 @@ struct SetlistView: View {
     @State private var showLastTandaWarning = false
     @State private var pasteMonitor: Any? = nil
     @State private var hogConflictWarning = false
+    @State private var hogDeviceStolenAlertShown = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -117,6 +118,13 @@ struct SetlistView: View {
         .onReceive(player.$currentEntryID) { activeEntryID = $0 }
         .onReceive(player.$isActivePlaying) { isPlayerActive = $0 }
         .onReceive(player.$hogModeConflict) { hogConflictWarning = $0 }
+        .onReceive(player.$hogDeviceStolenAlert) { if $0 { hogDeviceStolenAlertShown = true } }
+        .alert("Playback Interrupted", isPresented: $hogDeviceStolenAlertShown) {
+            Button("Retry") { player.retryOutputDevice() }
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Another app has taken exclusive access of the audio output device, so playback was paused. Release the exclusive access in that app, then tap Retry.")
+        }
         .alert("Save Setlist Report", isPresented: $showSaveReportDialog) {
             TextField("Setlist name", text: $saveReportName)
             Button("Save") {
