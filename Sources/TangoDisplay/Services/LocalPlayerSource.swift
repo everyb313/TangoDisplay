@@ -216,6 +216,9 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
         let wasPlaying = isActivePlaying
         let savedElapsed = elapsed
         let hogEnabled = settings.builtInHogMode
+        // Invalidate any pending dataPlayedBack callbacks before stopping the player node,
+        // so the stop doesn't spuriously fire handleTrackEnd → skipNext().
+        scheduleGeneration += 1
 
         isChangingDevice = true
 
