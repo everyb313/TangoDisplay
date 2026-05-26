@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.21.1-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.21.2-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,9 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.21.2
+- Fix: tracks dragged from Music.app (post-~July 2022 purchases) now land in the Setlist correctly — Music.app no longer includes a file URL in the drag pasteboard for these tracks, so TangoDisplay now resolves them via AppleScript instead
 
 ### v3.21.1
 - Fix: tracks purchased from Apple Music after July 2022 can now be dragged directly from the Music library into the Setlist on macOS Sequoia (previously the drop zone did not highlight and the file was silently ignored)

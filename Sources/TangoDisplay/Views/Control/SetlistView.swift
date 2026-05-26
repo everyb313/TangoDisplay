@@ -158,7 +158,7 @@ struct SetlistView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(isDragTargeted ? ControlTheme.accent.opacity(0.08) : Color.clear)
         .animation(.easeInOut(duration: 0.15), value: isDragTargeted)
-        .onDrop(of: [.fileURL, .audio], isTargeted: $isDragTargeted) { providers in
+        .onDrop(of: [.fileURL, .audio, UTType(importedAs: "com.apple.itunes.drag")], isTargeted: $isDragTargeted) { providers in
             Task {
                 let urls = await loadURLs(from: providers)
                 handleIncomingURLs(urls, anchorID: nil)
@@ -277,7 +277,7 @@ struct SetlistView: View {
                 let ids = Set(offsets.compactMap { setlist.entries[safe: $0]?.id })
                 pendingDeleteIDs = ids
             }
-            .onInsert(of: [.fileURL, .audio]) { offset, providers in
+            .onInsert(of: [.fileURL, .audio, UTType(importedAs: "com.apple.itunes.drag")]) { offset, providers in
                 // Convert the integer offset to a stable UUID anchor immediately,
                 // before any async work — the list may mutate during URL/metadata loading.
                 let anchorID: UUID? = offset < setlist.entries.count
@@ -552,11 +552,46 @@ struct SetlistView: View {
     }
 
     private func loadURLs(from providers: [NSItemProvider]) async -> [URL] {
+        // Music.app drag for post-~July 2022 purchases: these tracks omit public.file-url
+        // from the pasteboard and only provide com.apple.itunes.drag. Ask Music.app directly
+        // for the selected tracks' on-disk locations via AppleScript.
+        if providers.contains(where: { $0.hasItemConformingToTypeIdentifier("com.apple.itunes.drag") }) {
+            return await MainActor.run { resolveURLsViaMusicAppSelection() }
+        }
         var urls: [URL] = []
         for provider in providers {
             if let url = await resolveFileURL(from: provider) {
                 urls.append(url)
             }
+        }
+        return urls
+    }
+
+    @MainActor
+    private func resolveURLsViaMusicAppSelection() -> [URL] {
+        let source = """
+        tell application "Music"
+            set paths to {}
+            repeat with t in selection
+                try
+                    set end of paths to POSIX path of (location of t as alias)
+                end try
+            end repeat
+            return paths
+        end tell
+        """
+        let script = NSAppleScript(source: source)
+        var errorInfo: NSDictionary?
+        guard let descriptor = script?.executeAndReturnError(&errorInfo) else { return [] }
+        var urls: [URL] = []
+        if descriptor.numberOfItems > 0 {
+            for i in 1...descriptor.numberOfItems {
+                if let path = descriptor.atIndex(i)?.stringValue {
+                    urls.append(URL(fileURLWithPath: path))
+                }
+            }
+        } else if let path = descriptor.stringValue, !path.isEmpty {
+            urls.append(URL(fileURLWithPath: path))
         }
         return urls
     }
