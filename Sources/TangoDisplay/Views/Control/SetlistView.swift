@@ -9,6 +9,96 @@ private extension Array {
     }
 }
 
+// MARK: - AppKit Music.app drop handler
+//
+// SwiftUI's .onDrop only sees types bridged through NSItemProvider. Music.app puts
+// com.apple.itunes.drag directly on the NSPasteboard without bridging it, so the drop
+// zone never highlights for newer purchases. This AppKit layer has direct NSPasteboard
+// access and intercepts only Music.app drags; all other types fall through to SwiftUI.
+
+private class MusicAppDropView: NSView {
+    var onDrop: ([URL]) -> Void = { _ in }
+    var onTargeted: (Bool) -> Void = { _ in }
+
+    private static let pasteboardType = NSPasteboard.PasteboardType("com.apple.itunes.drag")
+
+    override init(frame: NSRect) {
+        super.init(frame: frame)
+        registerForDraggedTypes([Self.pasteboardType])
+    }
+    required init?(coder: NSCoder) { fatalError() }
+
+    private func hasMusicDrag(_ sender: NSDraggingInfo) -> Bool {
+        sender.draggingPasteboard.types?.contains(Self.pasteboardType) == true
+    }
+
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        guard hasMusicDrag(sender) else { return [] }
+        onTargeted(true)
+        return .copy
+    }
+    override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
+        guard hasMusicDrag(sender) else { return [] }
+        return .copy
+    }
+    override func draggingExited(_ sender: NSDraggingInfo?) { onTargeted(false) }
+    override func draggingEnded(_ sender: NSDraggingInfo) { onTargeted(false) }
+    override func prepareForDragOperation(_ sender: NSDraggingInfo) -> Bool { hasMusicDrag(sender) }
+
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        onTargeted(false)
+        let urls = resolveViaMusicSelection()
+        guard !urls.isEmpty else { return false }
+        onDrop(urls)
+        return true
+    }
+
+    private func resolveViaMusicSelection() -> [URL] {
+        let source = """
+        tell application "Music"
+            set paths to {}
+            repeat with t in selection
+                try
+                    set end of paths to POSIX path of (location of t as alias)
+                end try
+            end repeat
+            return paths
+        end tell
+        """
+        let script = NSAppleScript(source: source)
+        var errorInfo: NSDictionary?
+        guard let descriptor = script?.executeAndReturnError(&errorInfo) else { return [] }
+        var urls: [URL] = []
+        if descriptor.numberOfItems > 0 {
+            for i in 1...descriptor.numberOfItems {
+                if let path = descriptor.atIndex(i)?.stringValue {
+                    urls.append(URL(fileURLWithPath: path))
+                }
+            }
+        } else if let path = descriptor.stringValue, !path.isEmpty {
+            urls.append(URL(fileURLWithPath: path))
+        }
+        return urls
+    }
+}
+
+private struct MusicAppDropOverlay: NSViewRepresentable {
+    @Binding var isTargeted: Bool
+    let onDrop: ([URL]) -> Void
+
+    func makeNSView(context: Context) -> MusicAppDropView {
+        let view = MusicAppDropView()
+        configure(view)
+        return view
+    }
+    func updateNSView(_ nsView: MusicAppDropView, context: Context) { configure(nsView) }
+
+    private func configure(_ view: MusicAppDropView) {
+        view.onTargeted = { targeted in DispatchQueue.main.async { isTargeted = targeted } }
+        view.onDrop = onDrop
+    }
+}
+
 private func setlistFormatDuration(_ seconds: TimeInterval) -> String {
     guard seconds.isFinite && seconds >= 0 else { return "0:00" }
     let total = Int(seconds)
@@ -158,12 +248,17 @@ struct SetlistView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(isDragTargeted ? ControlTheme.accent.opacity(0.08) : Color.clear)
         .animation(.easeInOut(duration: 0.15), value: isDragTargeted)
-        .onDrop(of: [.fileURL, .audio, UTType(importedAs: "com.apple.itunes.drag")], isTargeted: $isDragTargeted) { providers in
+        .onDrop(of: [.fileURL, .audio], isTargeted: $isDragTargeted) { providers in
             Task {
                 let urls = await loadURLs(from: providers)
                 handleIncomingURLs(urls, anchorID: nil)
             }
             return true
+        }
+        .overlay {
+            MusicAppDropOverlay(isTargeted: $isDragTargeted) { urls in
+                handleIncomingURLs(urls, anchorID: nil)
+            }
         }
     }
 
@@ -277,7 +372,7 @@ struct SetlistView: View {
                 let ids = Set(offsets.compactMap { setlist.entries[safe: $0]?.id })
                 pendingDeleteIDs = ids
             }
-            .onInsert(of: [.fileURL, .audio, UTType(importedAs: "com.apple.itunes.drag")]) { offset, providers in
+            .onInsert(of: [.fileURL, .audio]) { offset, providers in
                 // Convert the integer offset to a stable UUID anchor immediately,
                 // before any async work — the list may mutate during URL/metadata loading.
                 let anchorID: UUID? = offset < setlist.entries.count
@@ -292,6 +387,11 @@ struct SetlistView: View {
         .listStyle(.plain)
         .overlay(alignment: .bottom) {
             dropHint
+        }
+        .overlay {
+            MusicAppDropOverlay(isTargeted: $isDragTargeted) { urls in
+                handleIncomingURLs(urls, anchorID: nil)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .automatic) {
@@ -552,46 +652,11 @@ struct SetlistView: View {
     }
 
     private func loadURLs(from providers: [NSItemProvider]) async -> [URL] {
-        // Music.app drag for post-~July 2022 purchases: these tracks omit public.file-url
-        // from the pasteboard and only provide com.apple.itunes.drag. Ask Music.app directly
-        // for the selected tracks' on-disk locations via AppleScript.
-        if providers.contains(where: { $0.hasItemConformingToTypeIdentifier("com.apple.itunes.drag") }) {
-            return await MainActor.run { resolveURLsViaMusicAppSelection() }
-        }
         var urls: [URL] = []
         for provider in providers {
             if let url = await resolveFileURL(from: provider) {
                 urls.append(url)
             }
-        }
-        return urls
-    }
-
-    @MainActor
-    private func resolveURLsViaMusicAppSelection() -> [URL] {
-        let source = """
-        tell application "Music"
-            set paths to {}
-            repeat with t in selection
-                try
-                    set end of paths to POSIX path of (location of t as alias)
-                end try
-            end repeat
-            return paths
-        end tell
-        """
-        let script = NSAppleScript(source: source)
-        var errorInfo: NSDictionary?
-        guard let descriptor = script?.executeAndReturnError(&errorInfo) else { return [] }
-        var urls: [URL] = []
-        if descriptor.numberOfItems > 0 {
-            for i in 1...descriptor.numberOfItems {
-                if let path = descriptor.atIndex(i)?.stringValue {
-                    urls.append(URL(fileURLWithPath: path))
-                }
-            }
-        } else if let path = descriptor.stringValue, !path.isEmpty {
-            urls.append(URL(fileURLWithPath: path))
         }
         return urls
     }
