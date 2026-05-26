@@ -4,6 +4,22 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 3.21.3</title>
+            <pubDate>Mon, 26 May 2026 18:00:00 +0000</pubDate>
+            <sparkle:version>71</sparkle:version>
+            <sparkle:shortVersionString>3.21.3</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li>Fix: Music.app drag-and-drop now correctly highlights and accepts tracks that Music.app no longer provides as file URLs (post-~July 2022 purchases)</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.21.3/TangoDisplay-v3.21.3-universal.zip"
+                sparkle:edSignature="e7Qq/rGs8Zg7xdOc8XU31sbOvkNKqcYaTMfRVQn8YUEf6y4Vg4Zam0qbzxe93QJpVYor+LJ9zBw4D18zcxEiDQ=="
+                length="5416415"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.21.2</title>
             <pubDate>Mon, 26 May 2026 17:30:00 +0000</pubDate>
             <sparkle:version>70</sparkle:version>
