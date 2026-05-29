@@ -714,6 +714,15 @@ struct SetlistView: View {
             dropHint
         }
         .toolbar {
+            if settings.decibelMeterEnabled {
+                ToolbarItem(placement: .automatic) {
+                    DecibelToolbarLabel(
+                        monitor: appState.microphoneMonitor,
+                        low:  settings.decibelMeterLowThreshold,
+                        high: settings.decibelMeterHighThreshold
+                    )
+                }
+            }
             ToolbarItem(placement: .automatic) {
                 Menu {
                     Button("Export to Apple Music") {
@@ -1464,5 +1473,29 @@ private struct RowProgressBarView: View {
         guard seconds.isFinite, seconds >= 0 else { return "0:00" }
         let s = Int(seconds)
         return String(format: "%d:%02d", s / 60, s % 60)
+    }
+}
+
+private struct DecibelToolbarLabel: View {
+    let monitor: MicrophoneMonitor
+    let low: Int
+    let high: Int
+    @State private var displayLevel: Int = 0
+    @State private var permissionDenied: Bool = false
+
+    var body: some View {
+        if !permissionDenied {
+            let color: Color = displayLevel < low ? .blue : (displayLevel >= high ? .red : .green)
+            Text("\(displayLevel) dB")
+                .font(.system(size: 12, design: .monospaced).bold())
+                .foregroundColor(color)
+                .frame(minWidth: 52, alignment: .trailing)
+                .onReceive(monitor.$level.throttle(for: .milliseconds(250), scheduler: RunLoop.main, latest: true)) {
+                    displayLevel = $0
+                }
+                .onReceive(monitor.$permissionDenied) {
+                    permissionDenied = $0
+                }
+        }
     }
 }

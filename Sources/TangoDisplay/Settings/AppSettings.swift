@@ -251,6 +251,18 @@ final class AppSettings: ObservableObject {
         }
     }
 
+    // MARK: - Decibel meter
+
+    @Published var decibelMeterEnabled: Bool {
+        didSet { UserDefaults.standard.set(decibelMeterEnabled, forKey: kPrefix + "decibelMeterEnabled") }
+    }
+    @Published var decibelMeterLowThreshold: Int {
+        didSet { UserDefaults.standard.set(decibelMeterLowThreshold, forKey: kPrefix + "decibelMeterLowThreshold") }
+    }
+    @Published var decibelMeterHighThreshold: Int {
+        didSet { UserDefaults.standard.set(decibelMeterHighThreshold, forKey: kPrefix + "decibelMeterHighThreshold") }
+    }
+
     // MARK: - Init
 
     init() {
@@ -357,6 +369,9 @@ final class AppSettings: ObservableObject {
             selectedAudioUnitPlugin = nil
         }
         lastUsedAUPresetName = ud.string(forKey: kPrefix + "lastUsedAUPresetName")
+        decibelMeterEnabled = ud.object(forKey: kPrefix + "decibelMeterEnabled").flatMap { $0 as? Bool } ?? false
+        decibelMeterLowThreshold  = ud.object(forKey: kPrefix + "decibelMeterLowThreshold").flatMap { $0 as? Int } ?? 60
+        decibelMeterHighThreshold = ud.object(forKey: kPrefix + "decibelMeterHighThreshold").flatMap { $0 as? Int } ?? 80
     }
 
     // MARK: - Helpers

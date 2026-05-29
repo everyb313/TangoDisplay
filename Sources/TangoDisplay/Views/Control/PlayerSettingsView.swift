@@ -109,7 +109,11 @@ struct PlayerSettingsView: View {
             }
 
             if settings.selectedPlayer == .builtIn, let localPlayer = appState.localPlayer {
+
+                // MARK: Playback
+
                 Section {
+                    subgroupLabel("Output")
                     LabeledContent("Main output:") {
                         HStack(spacing: 6) {
                             Picker("", selection: $settings.builtInOutputDeviceUID) {
@@ -155,10 +159,49 @@ struct PlayerSettingsView: View {
                             .buttonStyle(.borderless)
                         }
                     }
+
+                    subgroupLabel("Replay Gain")
+                    ReplayGainModePicker(mode: $settings.replayGainMode)
+                    Toggle("Prevent clipping", isOn: $settings.replayGainPreventClipping)
+                    LabeledContent("Preamp") {
+                        HStack(spacing: 8) {
+                            Slider(value: $settings.replayGainPreampDb, in: -12...6, step: 0.5)
+                            Text(String(format: "%+.1f dB", settings.replayGainPreampDb))
+                                .font(.system(size: 12, design: .monospaced))
+                                .frame(width: 56, alignment: .trailing)
+                        }
+                    }
+                    .disabled(settings.replayGainMode == .off)
+                    LabeledContent("Target Loudness") {
+                        HStack(spacing: 8) {
+                            Slider(value: $settings.replayGainTargetLufs, in: -23...(-14), step: 0.5)
+                            Text(String(format: "%.1f LUFS", settings.replayGainTargetLufs))
+                                .font(.system(size: 12, design: .monospaced))
+                                .frame(width: 72, alignment: .trailing)
+                        }
+                    }
+                    .disabled(settings.replayGainMode != .auto)
+                    Text("ReplayGain adjusts playback volume using loudness metadata stored in the audio file. Auto mode uses metadata when available; when absent it analyses the file and calculates a gain against the target loudness.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    subgroupLabel("Decibel Meter")
+                    Toggle("Enable decibel meter", isOn: $settings.decibelMeterEnabled)
+                    Text("Monitors the built-in microphone to show room noise level in the setlist toolbar.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    if settings.decibelMeterEnabled {
+                        DecibelMeterSettingsContent(monitor: appState.microphoneMonitor)
+                            .environmentObject(settings)
+                    }
+
+                    subgroupLabel("Audio Unit Plugin")
+                    AudioUnitPluginSettingsSection(player: localPlayer)
                 } header: {
-                    Text("Built-in Player")
-                        .foregroundColor(ControlTheme.accent)
+                    groupHeading("Playback")
                 }
+
+                // MARK: Cortinas
 
                 Section {
                     LabeledContent("Cortina fade") {
@@ -188,11 +231,33 @@ struct PlayerSettingsView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 } header: {
-                    Text("Cortinas")
-                        .foregroundColor(ControlTheme.accent)
+                    groupHeading("Cortinas")
                 }
 
+                // MARK: Safety
+
                 Section {
+                    subgroupLabel("Auto-gap")
+                    Toggle("Auto-gap", isOn: $settings.autoGapEnabled)
+                    if settings.autoGapEnabled {
+                        LabeledContent("Minimum gap") {
+                            HStack(spacing: 8) {
+                                Slider(value: $settings.autoGapDuration, in: 0.5...5, step: 0.5)
+                                Text("\(settings.autoGapDuration, specifier: "%.1f")s")
+                                    .font(.system(size: 12, design: .monospaced))
+                                    .frame(width: 36, alignment: .trailing)
+                            }
+                        }
+                        Toggle("Skip gap before first track", isOn: $settings.autoGapIgnoreFirstTrack)
+                        Text("The first track in the setlist starts immediately with no silence preroll.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    Text("Analyzes silence at track boundaries and adds padding so the gap between tracks meets the minimum. Only adds silence, never removes it.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    subgroupLabel("Mark as Played")
                     LabeledContent("Mark as played") {
                         Picker("", selection: $settings.markAsPlayedAfterCompletion) {
                             Text("After song ends").tag(true)
@@ -221,71 +286,30 @@ struct PlayerSettingsView: View {
                     Text("Controls when a track is marked as played. Once marked, resuming playback skips to the next track.")
                         .font(.caption)
                         .foregroundColor(.secondary)
+
+                    subgroupLabel("Duplicate Protection")
                     Toggle("Duplicate track protection", isOn: $settings.duplicateTrackProtection)
                     Text("Warns before adding a track that is already in the setlist.")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } header: {
-                    Text("Playback")
-                        .foregroundColor(ControlTheme.accent)
+                    groupHeading("Safety")
                 }
 
+                // MARK: Appearance
+
                 Section {
-                    Toggle("Auto-gap", isOn: $settings.autoGapEnabled)
-                    if settings.autoGapEnabled {
-                        LabeledContent("Minimum gap") {
-                            HStack(spacing: 8) {
-                                Slider(value: $settings.autoGapDuration, in: 0.5...5, step: 0.5)
-                                Text("\(settings.autoGapDuration, specifier: "%.1f")s")
-                                    .font(.system(size: 12, design: .monospaced))
-                                    .frame(width: 36, alignment: .trailing)
-                            }
-                        }
-                        Toggle("Skip gap before first track", isOn: $settings.autoGapIgnoreFirstTrack)
-                        Text("The first track in the setlist starts immediately with no silence preroll.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    Text("Analyzes silence at track boundaries and adds padding so the gap between tracks meets the minimum. Only adds silence, never removes it.")
+                    subgroupLabel("Genre Colours")
+                    Toggle("Genre tag colours", isOn: $settings.genreColorsEnabled)
+                    Text("Colour upcoming (unplayed) tracks by genre keyword. Keywords are case-insensitive and match anywhere in the genre name. Playing, paused, and already-played tracks are unaffected.")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                } header: {
-                    Text("Gap")
-                        .foregroundColor(ControlTheme.accent)
-                }
-
-                Section {
-                    ReplayGainModePicker(mode: $settings.replayGainMode)
-                    Toggle("Prevent clipping", isOn: $settings.replayGainPreventClipping)
-                    LabeledContent("Preamp") {
-                        HStack(spacing: 8) {
-                            Slider(value: $settings.replayGainPreampDb, in: -12...6, step: 0.5)
-                            Text(String(format: "%+.1f dB", settings.replayGainPreampDb))
-                                .font(.system(size: 12, design: .monospaced))
-                                .frame(width: 56, alignment: .trailing)
-                        }
+                    if settings.genreColorsEnabled {
+                        Toggle("Include song title", isOn: $settings.genreColorTitleEnabled)
+                        GenreColourRulesEditor(rules: $settings.genreColorRules)
                     }
-                    .disabled(settings.replayGainMode == .off)
-                    LabeledContent("Target Loudness") {
-                        HStack(spacing: 8) {
-                            Slider(value: $settings.replayGainTargetLufs, in: -23...(-14), step: 0.5)
-                            Text(String(format: "%.1f LUFS", settings.replayGainTargetLufs))
-                                .font(.system(size: 12, design: .monospaced))
-                                .frame(width: 72, alignment: .trailing)
-                        }
-                    }
-                    .disabled(settings.replayGainMode != .auto)
-                    Text("ReplayGain adjusts playback volume using loudness metadata stored in the audio file. Auto mode uses metadata when available; when absent it analyses the file and calculates a gain against the target loudness.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                } header: {
-                    Text("ReplayGain")
-                        .foregroundColor(ControlTheme.accent)
-                }
 
-                AudioUnitPluginSettingsSection(player: localPlayer)
-
-                Section {
+                    subgroupLabel("Track Info")
                     Toggle("Title", isOn: .constant(true)).disabled(true)
                     Toggle("Artist", isOn: .constant(true)).disabled(true)
                     Toggle("Genre", isOn: .constant(true)).disabled(true)
@@ -298,28 +322,29 @@ struct PlayerSettingsView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } header: {
-                    Text("Track Info")
-                        .foregroundColor(ControlTheme.accent)
-                }
-
-                Section {
-                    Toggle("Genre tag colours", isOn: $settings.genreColorsEnabled)
-                    Text("Colour upcoming (unplayed) tracks by genre keyword. Keywords are case-insensitive and match anywhere in the genre name. Playing, paused, and already-played tracks are unaffected.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    if settings.genreColorsEnabled {
-                        Toggle("Include song title", isOn: $settings.genreColorTitleEnabled)
-                        GenreColourRulesEditor(rules: $settings.genreColorRules)
-                    }
-                } header: {
-                    Text("Genre Colours")
-                        .foregroundColor(ControlTheme.accent)
+                    groupHeading("Appearance")
                 }
             }
         }
         .formStyle(.grouped)
         .padding()
         .onAppear { appState.refreshAudioOutputDeviceList() }
+    }
+
+    @ViewBuilder
+    private func groupHeading(_ title: String) -> some View {
+        Text(title)
+            .font(.title3.bold())
+            .foregroundColor(.white)
+            .textCase(nil)
+    }
+
+    @ViewBuilder
+    private func subgroupLabel(_ title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .foregroundColor(ControlTheme.accent)
+            .padding(.top, 4)
     }
 
     private func loadJRiverZones() {
@@ -447,6 +472,45 @@ struct PlayerSettingsView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
                 }
+            }
+        }
+    }
+}
+
+private struct DecibelMeterSettingsContent: View {
+    @ObservedObject var monitor: MicrophoneMonitor
+    @EnvironmentObject var settings: AppSettings
+
+    var body: some View {
+        if monitor.permissionDenied {
+            Label {
+                Text("Microphone access denied. Open System Settings → Privacy & Security → Microphone to grant access.")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            } icon: {
+                Image(systemName: "mic.slash.fill")
+                    .foregroundColor(.orange)
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Drag the handles to set band boundaries (0–140 dB)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                DecibelRangeSelectorView(
+                    low:  $settings.decibelMeterLowThreshold,
+                    high: $settings.decibelMeterHighThreshold
+                )
+                HStack {
+                    Label("Too quiet", systemImage: "circle.fill")
+                        .foregroundColor(.blue)
+                    Spacer()
+                    Label("Perfect", systemImage: "circle.fill")
+                        .foregroundColor(.green)
+                    Spacer()
+                    Label("Too loud", systemImage: "circle.fill")
+                        .foregroundColor(.red)
+                }
+                .font(.caption)
             }
         }
     }

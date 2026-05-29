@@ -18,7 +18,7 @@ struct AudioUnitPluginSettingsSection: View {
     }
 
     var body: some View {
-        Section {
+        Group {
             Toggle("Enable Audio Unit Plugin", isOn: Binding(
                 get: { settings.audioUnitPluginEnabled },
                 set: { enabled in
@@ -113,10 +113,6 @@ struct AudioUnitPluginSettingsSection: View {
                     .foregroundColor(.secondary)
                     .lineLimit(1)
             }
-        } header: {
-            Text("Audio Unit Plugin")
-                .foregroundColor(ControlTheme.accent)
-        } footer: {
             Text("Advanced feature — test your plugin before using it live. If loading fails, Setlist continues without it.")
                 .font(.caption)
                 .foregroundColor(.secondary)

@@ -68,9 +68,9 @@ cat > "$CONTENTS/Info.plist" <<EOF
   <key>CFBundleIconFile</key>
   <string>icon</string>
   <key>CFBundleVersion</key>
-  <string>75</string>
+  <string>76</string>
   <key>CFBundleShortVersionString</key>
-  <string>3.21.6</string>
+  <string>3.21.7</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>LSMinimumSystemVersion</key>
@@ -86,6 +86,9 @@ cat > "$CONTENTS/Info.plist" <<EOF
   <!-- Required for global hotkeys (⌘⇧O/P/R) -->
   <key>NSInputMonitoringUsageDescription</key>
   <string>TangoDisplay uses global keyboard shortcuts so you can trigger overrides and pauses without switching windows.</string>
+  <!-- Required for built-in microphone room noise monitoring (decibel meter) -->
+  <key>NSMicrophoneUsageDescription</key>
+  <string>TangoDisplay monitors the microphone to measure room noise so you can see whether music is too quiet, perfect, or too loud for the dance floor.</string>
   <!-- Sparkle auto-update -->
   <key>SUFeedURL</key>
   <string>https://raw.githubusercontent.com/richardsladetdj-creator/TangoDisplay/main/appcast.xml</string>

@@ -37,6 +37,7 @@ final class AppState: ObservableObject {
     let profileStore = ProfileStore()
     let versionChecker = VersionChecker()
     let setlist = SetlistManager()
+    let microphoneMonitor = MicrophoneMonitor()
     private var activeSource: any MusicPlayerSource = MusicPoller()  // replaced in start()
     private var cancellables = Set<AnyCancellable>()
 
@@ -81,6 +82,7 @@ final class AppState: ObservableObject {
             .store(in: &cancellables)
         observePlayerSelection()
         observeJRiverZone()
+        observeMicrophoneMonitor()
     }
 
     // MARK: - Lifecycle
@@ -90,6 +92,7 @@ final class AppState: ObservableObject {
         wireCallbacks(to: activeSource)
         activeSource.start()
         versionChecker.startPeriodicChecks()
+        if settings.decibelMeterEnabled { microphoneMonitor.start() }
     }
 
     func pollNow() {
@@ -151,6 +154,16 @@ final class AppState: ObservableObject {
             .sink { [weak self] _ in
                 guard let self, self.settings.selectedPlayer == .jriver else { return }
                 self.switchSource(to: .jriver)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func observeMicrophoneMonitor() {
+        settings.$decibelMeterEnabled
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] enabled in
+                enabled ? self?.microphoneMonitor.start() : self?.microphoneMonitor.stop()
             }
             .store(in: &cancellables)
     }

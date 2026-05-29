@@ -460,6 +460,39 @@ When a plugin is selected, a **puzzle piece button** appears in the Setlist tool
 
 ---
 
+## Decibel Meter
+
+The decibel meter monitors ambient room noise in real time using your Mac's built-in microphone, giving you a live reading of how loud the room is without needing a separate tool.
+
+### Enabling the Decibel Meter
+
+1. Go to **Settings › Player**
+2. Under **Built-in Player**, enable the **Enable decibel meter** toggle
+
+macOS will prompt for microphone access the first time you enable it. If you decline or later revoke the permission, an orange warning appears in the settings panel. Grant access in **System Settings › Privacy & Security › Microphone**.
+
+### Toolbar Indicator
+
+When enabled, a live dB reading appears in the Setlist toolbar showing the current room level (e.g. `68 dB`). The reading is colour-coded against your configured range:
+
+| Colour | Meaning |
+|---|---|
+| Blue | Below the low threshold — room is quieter than expected |
+| Green | Within the acceptable range |
+| Red | Above the high threshold — room is too loud |
+
+The indicator updates every 250 ms and disappears automatically if microphone permission is denied.
+
+### Setting Your Range
+
+Use the interactive range slider in **Settings › Player › Decibel Meter** to configure your thresholds. The slider shows three colour zones — blue, green, and red — with draggable handles for the low and high boundaries (0–140 dB). The defaults are 60 dB (low) and 80 dB (high).
+
+> **Practical Use Case:** As the noise level can often vary between the DJ booth and the floor, set the noise level with a professional noise meter at floor level. Measure at the desk and set the acceptable range in Setlist.
+
+The meter runs only when enabled — it has no CPU overhead when turned off.
+
+---
+
 ## Audio Output
 
 By default the built-in player uses the macOS system default output device. To route audio to a specific device (e.g. a dedicated DJ audio interface):
@@ -530,6 +563,10 @@ These options appear only when **Built-in Player** is selected.
 **Auto-fade all cortinas** — when enabled, TangoDisplay automatically fades out cortinas and advances to the next track at the configured play time. Requires cortina detection to be set up via Cortina Rules.
 
 **Cortina play time** — how many seconds of a cortina should play before the auto-fade begins (5–120 s, in 1-second steps). Default: 30 seconds. Visible only when Auto-fade is enabled. For cortinas shorter than play time + fade duration, the fade starts earlier so it always completes cleanly.
+
+**Enable decibel meter** — when enabled, TangoDisplay monitors ambient room noise using the Mac's built-in microphone and shows a live colour-coded dB reading in the Setlist toolbar. Requires microphone permission.
+
+**Decibel meter range** — an interactive three-zone slider to configure the low and high thresholds (0–140 dB). Readings below the low threshold appear blue, within range appear green, and above the high threshold appear red. Defaults: 60 dB (low), 80 dB (high). Visible only when the decibel meter is enabled.
 
 **Mark as played** — controls when a track receives its played stamp:
 

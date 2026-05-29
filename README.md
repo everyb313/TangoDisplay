@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.21.6-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.21.7-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,12 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.21.7
+- Decibel Meter: real-time room noise monitor in the Setlist toolbar. Enable in **Settings › Player › Decibel Meter** and set your acceptable noise range with the interactive colour-coded slider (blue = too quiet, green = acceptable, red = too loud)
+- Practical Use Case: As the noise level can often vary between the DJ booth and the floor, set the noise level with a professional noise meter at floor level. Measure at the desk and set the acceptable range in Setlist.
+- Built-in Player settings reorganised into logical groups (Playback, Cortinas, Safety, Appearance) for clarity
+- Updated app icon
 
 ### v3.21.6
 - Track counter position is now configurable: top-left, top-right, bottom-left, bottom-right, or centred inline with track text
