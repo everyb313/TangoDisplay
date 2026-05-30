@@ -468,6 +468,20 @@ struct SetlistView: View {
     @State private var hogConflictWarning = false
     @State private var hogDeviceStolenAlertShown = false
 
+    // Seed the @State mirrors from the player so the very first body render
+    // after this view is (re-)created already reflects the live playing track.
+    // Without this, returning to the Setlist tab while a track is past its
+    // mark-as-played threshold renders one frame with activeEntryID=nil and
+    // isPlayerActive=false — Hide Played then filters the playing row out,
+    // and the row that re-appears after .onAppear briefly shows as "played".
+    init(setlist: SetlistManager, player: LocalPlayerSource) {
+        self._setlist = ObservedObject(wrappedValue: setlist)
+        self.player = player
+        self._activeEntryID = State(initialValue: player.currentEntryID)
+        self._isPlayerActive = State(initialValue: player.isActivePlaying)
+        self._hogConflictWarning = State(initialValue: player.hogModeConflict)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             PlayerControlsView(player: player, onScrollToCurrentTrack: {

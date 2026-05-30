@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.21.9-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.21.10-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,9 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.21.10
+- Fixed: with **Hide Played** on, returning to the Setlist tab after switching to another tab no longer briefly hides (or de-emphasises) the currently playing track when it is past its mark-as-played threshold.
 
 ### v3.21.9
 - Fixed: with **Hide Played** on, dragging in new tracks now lands in the correct slot. Reordering and deleting rows in the filtered list also now affect the row you actually clicked. (Previously, hidden played tracks caused offsets to be resolved against the unfiltered list, so the wrong row was targeted.)
