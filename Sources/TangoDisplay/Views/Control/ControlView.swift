@@ -6,6 +6,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
     case live
     case setlist
     case reports
+    case startup
     case cortinaRules
     case appearance
     case display
@@ -18,6 +19,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .live:          return "Live"
         case .setlist:       return "Setlist"
         case .reports:       return "Reports"
+        case .startup:       return "Startup"
         case .cortinaRules:  return "Cortina Rules"
         case .appearance:    return "Appearance"
         case .display:       return "Display"
@@ -32,6 +34,7 @@ enum SidebarItem: String, Hashable, CaseIterable {
         case .live:          return "play.circle.fill"
         case .setlist:       return "list.number"
         case .reports:       return "chart.bar.doc.horizontal"
+        case .startup:       return "power"
         case .cortinaRules:  return "music.note"
         case .appearance:    return "paintbrush"
         case .display:       return "display"
@@ -43,9 +46,9 @@ enum SidebarItem: String, Hashable, CaseIterable {
 
     var section: String {
         switch self {
-        case .live, .setlist, .reports:                                 return "Live"
-        case .cortinaRules, .appearance, .display, .player, .advanced: return "Settings"
-        case .profiles:                                                 return "Profiles"
+        case .live, .setlist, .reports:                                            return "Live"
+        case .startup, .cortinaRules, .appearance, .display, .player, .advanced:   return "Settings"
+        case .profiles:                                                            return "Profiles"
         }
     }
 }
@@ -63,6 +66,7 @@ struct ControlView: View {
     @AppStorage("focusMode") private var focusMode: Bool = false
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
     @State private var preFocusSelectedItem: SidebarItem? = nil
+    @State private var didApplyStartupPreferences = false
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -88,7 +92,12 @@ struct ControlView: View {
         .background(ControlWindowAccessor())
         .onAppear {
             focusMode = false
-            WindowManager.ensureOpen(openWindow: openWindow)
+            if !didApplyStartupPreferences {
+                didApplyStartupPreferences = true
+                applyStartupPreferences()
+            } else {
+                WindowManager.ensureOpen(openWindow: openWindow)
+            }
             appState.reopenPresentationWindow = { openWindow(id: "presentation") }
             if let displayID = appState.settings.targetDisplayID {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -143,6 +152,32 @@ struct ControlView: View {
         }
     }
 
+    // MARK: - Startup preferences
+
+    private func applyStartupPreferences() {
+        if appState.settings.hideLeftMenuBarOnStartup {
+            columnVisibility = .detailOnly
+        }
+        switch appState.settings.startupMode {
+        case .fullExperience:
+            WindowManager.ensureOpen(openWindow: openWindow)
+            // Bring the Settings window in front of the Live Display so the user
+            // can configure things before moving the presentation to its monitor.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                WindowManager.showControlWindow()
+            }
+        case .playerFocused:
+            selectedItem = .setlist
+            WindowManager.ensureOpen(openWindow: openWindow)
+            // Wait for WindowAccessor to register the NSWindow, then miniaturise
+            // and bring the Control window forward.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                WindowManager.presentationWindow?.miniaturize(nil)
+                WindowManager.showControlWindow()
+            }
+        }
+    }
+
     // MARK: - Sidebar
 
     private var selectionBinding: Binding<SidebarItem?> {
@@ -169,6 +204,7 @@ struct ControlView: View {
                 sidebarRow(.reports)
             }
             Section("Global Settings") {
+                sidebarRow(.startup)
                 sidebarRow(.cortinaRules)
                 sidebarRow(.display)
                 sidebarRow(.player)
@@ -208,6 +244,9 @@ struct ControlView: View {
                 setlistView
             case .reports:
                 SetlistReportingView()
+            case .startup:
+                StartupSettingsView()
+                    .environmentObject(appState.settings)
             case .cortinaRules:
                 CortinaSettingsView()
                     .environmentObject(appState)

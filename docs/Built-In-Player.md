@@ -252,6 +252,22 @@ Right-click any cortina row in the setlist and select **Skip Auto-fade** to disa
 
 ---
 
+## Cortina Volume Reduction
+
+Cortinas often sit louder than the dance tracks around them — sometimes by design, sometimes because ReplayGain alone doesn't bring the level down enough for a milonga floor. The **Cortina volume** slider lets you pull every detected cortina down by a fixed amount in dB without touching the source files or affecting dance tracks.
+
+### Enabling
+
+1. Go to **Settings › Player**
+2. Under **Cortinas**, move the **Cortina volume** slider
+3. Range: **-10 dB to 0 dB** in 0.5 dB steps. Default **0 dB** (off).
+
+The reduction is applied **on top of ReplayGain** — if ReplayGain is on, the cortina's per-track gain is calculated first and the slider's reduction is multiplied in after. A track is treated as a cortina if it matches the same cortina-detection rules used elsewhere in TangoDisplay (configured in **Settings › Cortina Rules**).
+
+Changes apply live: move the slider while a cortina is playing and the level updates immediately.
+
+---
+
 ## Last Tanda
 
 Pre-schedule which cortina is the last tanda of your milonga. When that cortina plays, TangoDisplay automatically activates the Last Tanda label on the dancer display — no manual intervention needed mid-set.

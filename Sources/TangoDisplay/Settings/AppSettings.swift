@@ -11,6 +11,20 @@ struct GenreColorRule: Codable, Identifiable, Equatable {
     var colorHex: String
 }
 
+enum StartupMode: String, CaseIterable, Identifiable {
+    case fullExperience
+    case playerFocused
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .fullExperience: return "Full Experience"
+        case .playerFocused:  return "Player Focused"
+        }
+    }
+}
+
 /// All user-configurable settings, persisted to UserDefaults.
 /// Arrays are stored as comma-joined strings to avoid UserDefaults type-registration issues.
 final class AppSettings: ObservableObject {
@@ -159,6 +173,10 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(cortinaPlayTime, forKey: kPrefix + "cortinaPlayTime") }
     }
 
+    @Published var cortinaVolumeReductionDb: Double {
+        didSet { UserDefaults.standard.set(cortinaVolumeReductionDb, forKey: kPrefix + "cortinaVolumeReductionDb") }
+    }
+
     // MARK: - Built-in player track info
 
     @Published var duplicateTrackProtection: Bool {
@@ -267,6 +285,15 @@ final class AppSettings: ObservableObject {
         didSet { UserDefaults.standard.set(hidePlayed, forKey: kPrefix + "hidePlayed") }
     }
 
+    // MARK: - Startup
+
+    @Published var startupMode: StartupMode {
+        didSet { UserDefaults.standard.set(startupMode.rawValue, forKey: kPrefix + "startupMode") }
+    }
+    @Published var hideLeftMenuBarOnStartup: Bool {
+        didSet { UserDefaults.standard.set(hideLeftMenuBarOnStartup, forKey: kPrefix + "hideLeftMenuBarOnStartup") }
+    }
+
     // MARK: - Init
 
     init() {
@@ -324,6 +351,7 @@ final class AppSettings: ObservableObject {
         autoGapIgnoreFirstTrack = ud.object(forKey: kPrefix + "autoGapIgnoreFirstTrack").flatMap { $0 as? Bool } ?? true
         autoFadeCortinasEnabled = ud.object(forKey: kPrefix + "autoFadeCortinasEnabled").flatMap { $0 as? Bool } ?? false
         cortinaPlayTime = ud.object(forKey: kPrefix + "cortinaPlayTime").flatMap { $0 as? Double } ?? 30.0
+        cortinaVolumeReductionDb = ud.object(forKey: kPrefix + "cortinaVolumeReductionDb").flatMap { $0 as? Double } ?? 0.0
         duplicateTrackProtection = ud.object(forKey: kPrefix + "duplicateTrackProtection")
             .flatMap { $0 as? Bool } ?? false
         showYear = ud.object(forKey: kPrefix + "showYear").flatMap { $0 as? Bool } ?? true
@@ -377,6 +405,10 @@ final class AppSettings: ObservableObject {
         decibelMeterLowThreshold  = ud.object(forKey: kPrefix + "decibelMeterLowThreshold").flatMap { $0 as? Int } ?? 60
         decibelMeterHighThreshold = ud.object(forKey: kPrefix + "decibelMeterHighThreshold").flatMap { $0 as? Int } ?? 80
         hidePlayed = ud.object(forKey: kPrefix + "hidePlayed").flatMap { $0 as? Bool } ?? false
+        let rawStartup = ud.string(forKey: kPrefix + "startupMode") ?? ""
+        startupMode = StartupMode(rawValue: rawStartup) ?? .fullExperience
+        hideLeftMenuBarOnStartup = ud.object(forKey: kPrefix + "hideLeftMenuBarOnStartup")
+            .flatMap { $0 as? Bool } ?? false
     }
 
     // MARK: - Helpers

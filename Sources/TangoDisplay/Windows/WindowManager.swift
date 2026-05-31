@@ -17,8 +17,18 @@ final class WindowManager {
     // MARK: - Registration (called from WindowAccessor inside PresentationView)
 
     static func register(_ window: NSWindow) {
-        guard window.identifier?.rawValue != "com.tangodisplay.presentation" ||
-              presentationWindow == nil else { return }
+        // Same window re-registering (e.g. WindowAccessor.updateNSView).
+        if presentationWindow === window { return }
+
+        // A different presentation window already exists — this happens when macOS
+        // state restoration brings one back and ControlView's ensureOpen() then
+        // calls openWindow() before the restored window has registered. Close the
+        // duplicate so there is only ever one Live Display window.
+        if presentationWindow != nil {
+            DispatchQueue.main.async { window.close() }
+            return
+        }
+
         presentationWindow = window
         window.delegate = CloseGuard.shared
     }

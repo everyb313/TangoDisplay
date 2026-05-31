@@ -370,7 +370,15 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
         }
 
         let result = calculateReplayGain(info: info, analysis: analysis, settings: rgSettings)
-        replayGainMixer.outputVolume = result.linearGain
+        var finalGain = result.linearGain
+        let cortinaCutDb = settings.cortinaVolumeReductionDb
+        if cortinaCutDb < 0 {
+            let detector = settings.makeDetector()
+            if detector.isCortina(genre: entry.track.genre) {
+                finalGain *= Float(pow(10.0, cortinaCutDb / 20.0))
+            }
+        }
+        replayGainMixer.outputVolume = finalGain
 
         let analysisInFlight = inFlightAnalysisURLs.contains(entry.fileURL)
         replayGainStatus = replayGainStatusString(result: result, settings: rgSettings,
@@ -1201,6 +1209,11 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
             .sink { [weak self] _ in self?.reapplyReplayGainIfLoaded() }
             .store(in: &cancellables)
         settings.$replayGainTargetLufs
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.reapplyReplayGainIfLoaded() }
+            .store(in: &cancellables)
+        settings.$cortinaVolumeReductionDb
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.reapplyReplayGainIfLoaded() }

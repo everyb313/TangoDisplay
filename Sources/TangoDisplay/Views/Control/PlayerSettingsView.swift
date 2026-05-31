@@ -230,6 +230,17 @@ struct PlayerSettingsView: View {
                             .foregroundColor(.orange)
                             .fixedSize(horizontal: false, vertical: true)
                     }
+                    LabeledContent("Cortina volume") {
+                        HStack(spacing: 8) {
+                            Slider(value: $settings.cortinaVolumeReductionDb, in: -10...0, step: 0.5)
+                            Text(String(format: "%+.1f dB", settings.cortinaVolumeReductionDb))
+                                .font(.system(size: 12, design: .monospaced))
+                                .frame(width: 56, alignment: .trailing)
+                        }
+                    }
+                    Text("Reduces the playback level of tracks identified as cortinas by the cortina-detection rules. Applied on top of ReplayGain.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 } header: {
                     groupHeading("Cortinas")
                 }

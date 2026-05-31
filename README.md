@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.21.10-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.22.0-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,11 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.22.0
+- **Startup Mode** (new): choose how TangoDisplay launches in **Settings › Startup**. *Full Experience* opens both the Live Display and Settings window with Settings brought forward. *Player Focused* starts the Live Display minimised to the Dock with Settings focused — restore it any time from the menu bar icon or Dock.
+- **Hide Left Menu Bar on Startup** (new): collapse the Settings sidebar at launch. Expand it again at any time.
+- **Cortina volume**: new slider in **Settings › Player › Cortinas** (-10…0 dB) that attenuates the playback level of tracks identified as cortinas on top of ReplayGain. Default 0 dB (off).
 
 ### v3.21.10
 - Fixed: with **Hide Played** on, returning to the Setlist tab after switching to another tab no longer briefly hides (or de-emphasises) the currently playing track when it is past its mark-as-played threshold.
