@@ -4,6 +4,22 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 3.22.1</title>
+            <pubDate>Tue, 02 Jun 2026 11:08:24 +0000</pubDate>
+            <sparkle:version>81</sparkle:version>
+            <sparkle:shortVersionString>3.22.1</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li><strong>Fix</strong>: dragging a large multi-track selection from Music.app into the Setlist no longer truncates to a handful of tracks. The drop handler was reading the Music-specific promise pasteboard flavor (present on only a subset of items) instead of public.file-url (present on nearly every item), causing the rest of the selection to be silently dropped.</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.22.1/TangoDisplay-v3.22.1-universal.zip"
+                sparkle:edSignature="3P3ZfwDFdEi+iF3dc5BbbctzdxYCVZf4me+7Ul0BK1Zpwb3j5ha8l9rw5/sBleGAB2zBxDW69Fh+y/7emcEKBA=="
+                length="5574126"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.22.0</title>
             <pubDate>Sun, 31 May 2026 09:54:44 +0000</pubDate>
             <sparkle:version>80</sparkle:version>
