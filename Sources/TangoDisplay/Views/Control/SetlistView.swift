@@ -156,23 +156,25 @@ private class MusicAppDropView: NSView {
         return false
     }
 
-    // Legacy file-promise path. Music.app on Sequoia uses
-    // com.apple.pasteboard.promised-file-url, which predates NSFilePromiseReceiver.
-    // We dispatch the synchronous namesOfPromisedFiles call off the main thread so
-    // the UI stays responsive while Music.app writes the file. The returned URLs
-    // are delivered via onDrop on main.
-    // Music.app on Sequoia stores the real file URL as a plain string under the
-    // promised-file-url flavor. For locally-cached tracks (purchased downloads, iTunes
-    // Match present-on-disk) we read that URL directly — no copy needed. For tracks
-    // that aren't on disk (pure iCloud), the URL won't resolve, so we fall back to
-    // namesOfPromisedFilesDropped which asks Music.app to materialise the file in our
-    // app-support cache.
+    // Legacy file-promise path. Music.app on Sequoia advertises
+    // com.apple.pasteboard.promised-file-url on the root pasteboard, but in
+    // practice only a small subset of per-item NSPasteboardItems carry the
+    // promise string — the rest carry just public.file-url. Read file-url
+    // first per item and fall back to the promise string, so multi-track
+    // drags (e.g. an entire 108-track playlist) aren't truncated to the
+    // few items that happen to advertise the promise flavor.
+    //
+    // If none of the items resolve to an on-disk file, fall back to
+    // namesOfPromisedFilesDropped to ask Music.app to materialise the files
+    // in our app-support cache (the genuine cloud-only case).
     private func acceptLegacyFilePromise(_ sender: NSDraggingInfo) -> Bool {
         let pb = sender.draggingPasteboard
 
         var urls: [URL] = []
         for item in pb.pasteboardItems ?? [] {
-            guard let str = item.string(forType: Self.legacyPromiseURLType),
+            let str = item.string(forType: .fileURL)
+                ?? item.string(forType: Self.legacyPromiseURLType)
+            guard let str,
                   let url = URL(string: str),
                   url.isFileURL,
                   FileManager.default.fileExists(atPath: url.path)
@@ -186,8 +188,8 @@ private class MusicAppDropView: NSView {
             return true
         }
 
-        // Track is not on disk — ask Music.app to materialise it via the legacy
-        // file-promise mechanism. Blocking but only hit for cloud-only tracks.
+        // No on-disk URLs at all — ask Music.app to materialise the promised
+        // files. Blocking but only hit for pure cloud-only drags.
         let destDir = Self.filePromiseDestination()
         let names = sender.namesOfPromisedFilesDropped(atDestination: destDir) ?? []
         let writtenURLs = names.map { destDir.appendingPathComponent($0) }
