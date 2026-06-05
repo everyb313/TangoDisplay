@@ -37,6 +37,7 @@ final class AppState: ObservableObject {
     let profileStore = ProfileStore()
     let versionChecker = VersionChecker()
     let setlist = SetlistManager()
+    let configStore = PluginConfigurationStore()
     let microphoneMonitor = MicrophoneMonitor()
     lazy var setlistRemoteBridge: RemoteControlBridge = RemoteControlBridge(appState: self, settings: self.settings)
     private var activeSource: any MusicPlayerSource = MusicPoller()  // replaced in start()
@@ -153,7 +154,7 @@ final class AppState: ObservableObject {
         case .embrace:  return EmbracMonitor()
         case .jriver:   return JRiverPoller(zoneID: settings.jriverZoneID)
         case .megaSeg:  return MegaSegMonitor()
-        case .builtIn:  return LocalPlayerSource(setlist: setlist, settings: settings, volume: settings.builtInVolume)
+        case .builtIn:  return LocalPlayerSource(setlist: setlist, settings: settings, configStore: configStore, volume: settings.builtInVolume)
         }
     }
 

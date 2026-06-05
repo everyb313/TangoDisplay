@@ -49,7 +49,7 @@ A native macOS menu-bar app that shows a clean, fullscreen dancer display on an 
 ### Option A — Download pre-built app (easiest)
 
 1. Go to the [Releases](https://github.com/richardsladetdj-creator/TangoDisplay/releases) page
-2. Download `TangoDisplay-v3.24.1-universal.zip` (works on both Apple Silicon and Intel Macs)
+2. Download `TangoDisplay-v3.24.2-universal.zip` (works on both Apple Silicon and Intel Macs)
 3. Unzip and drag `TangoDisplay.app` to your `/Applications` folder
 4. **Right-click › Open** on first launch (required because the app is ad-hoc signed, not notarised)
 5. Grant the permissions macOS requests (see [Permissions](#permissions) below)
@@ -135,6 +135,10 @@ Key design decisions:
 ---
 
 ## Changelog
+
+### v3.24.2
+- **Plugin Configurations**: save and recall named AU plugin chain settings; assign a configuration to individual setlist tracks; tracks with an assigned configuration display a badge in the setlist
+- **Fixed crash when playing a mono (or otherwise format-incompatible) audio file** while a stereo-only AU plugin (e.g. FabFilter Transient Gizmo) is active; the incompatible plugin is now gracefully disabled instead
 
 ### v3.24.1
 - **More third-party plugins now appear**: the plugin browser also lists **Music Effect** Audio Units (`kAudioUnitType_MusicEffect`), not just plain effects — so plugins such as **FabFilter Pro-Q 4** that register as music effects now show up and can be added to the chain.

@@ -473,6 +473,31 @@ A **Preset:** bar at the bottom of each plugin's editor window mirrors the Setti
 
 **Dirty state:** If you adjust any parameter directly in a plugin window (e.g. drag an EQ band), that slot's preset label resets to **None** to show the state no longer matches a saved preset.
 
+### Plugin Configurations
+
+While per-slot **Presets** save a single plugin's parameters, a **Plugin Configuration** snapshots the entire chain state — every slot, every parameter — under one name. You can then assign that configuration to specific setlist tracks so the chain automatically switches when those tracks play.
+
+**Saving a configuration:**
+
+1. Set up your plugin chain exactly as you want it (plugin selection, slot order, parameters)
+2. Go to **Settings › Player › Audio Unit Plugins** and click **Save current settings as configuration…**
+3. Enter a name — the snapshot is stored immediately
+
+**Managing configurations:**
+
+| Control | What it does |
+|---|---|
+| Circle icon | Tap to set a configuration as the **default** (applied to all tracks without an explicit assignment) |
+| **Remove default** | Clears the default; the chain will not switch automatically for unassigned tracks |
+| **Rename** | Rename a saved configuration in place |
+| Trash icon | Delete a configuration permanently |
+
+**Assigning a configuration to a setlist track:**
+
+Right-click (or control-click) one or more tracks in the Setlist and choose **Apply Configuration** from the context menu. The track shows a small purple badge with the configuration name. When TangoDisplay plays that track, the chain automatically switches to the assigned configuration — and restores your previous settings when a track without an assignment plays next.
+
+To remove an assignment, right-click the track and choose **Apply Configuration › None**.
+
 ### Setlist Toolbar Quick Access
 
 When the chain has at least one plugin, a **puzzle piece button** appears in the Setlist toolbar next to the ReplayGain button. Click it to open a popover for live chain access without going to Settings: enable or bypass the whole chain, toggle individual slots on or off, and open each plugin's editor window.
