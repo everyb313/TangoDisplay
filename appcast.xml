@@ -4,6 +4,23 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 3.25.2</title>
+            <pubDate>Tue, 10 Jun 2026 12:00:00 +0000</pubDate>
+            <sparkle:version>92</sparkle:version>
+            <sparkle:shortVersionString>3.25.2</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li><strong>DJ Name</strong>: show your name on the dancer display — configurable corner or centred position, with a "Show when" control (any track playing / idle &amp; paused / always).</li>
+                    <li><strong>Fixed</strong>: when dragging a mixed batch with Duplicate Protection on, duplicates could be inserted at the drop position instead of the end of the setlist.</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.25.2/TangoDisplay-v3.25.2-universal.zip"
+                sparkle:edSignature="DZVJal3JmTinrYvKEach78DxORgstHplsWU8rar7GUYmUaqhrlsnYKlrg6tyu6C/p+K1GaGPfjfinqett2G/DQ=="
+                length="6411553"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.25.1</title>
             <pubDate>Sun, 08 Jun 2026 13:00:00 +0000</pubDate>
             <sparkle:version>91</sparkle:version>
