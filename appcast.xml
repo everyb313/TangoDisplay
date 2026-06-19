@@ -4,6 +4,22 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 3.26.3</title>
+            <pubDate>Fri, 19 Jun 2026 17:02:38 +0000</pubDate>
+            <sparkle:version>100</sparkle:version>
+            <sparkle:shortVersionString>3.26.3</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li>Revert &ldquo;Mark as Played / Not Played&rdquo; no longer leaves a played track stranded below a queued one. Fixes mark as played selection not working on single tracks.</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v3.26.3/TangoDisplay-v3.26.3-universal.zip"
+                sparkle:edSignature="BqfJsa3UdxVwb6C7T5ZBMYZO26cdkA+9q2kwJq4DqPLLfXe7G/YY5PXRINBJlLvha6rbP4zRL8GVNJGG9saWCw=="
+                length="6509662"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.26.2</title>
             <pubDate>Thu, 18 Jun 2026 18:24:13 +0000</pubDate>
             <sparkle:version>99</sparkle:version>
