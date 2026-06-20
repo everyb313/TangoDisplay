@@ -231,6 +231,15 @@ If no docs were updated in this release, skip this step.
 
 ---
 
+## Step 10 — Delete the local zip
+
+Now that the zip is uploaded to GitHub, delete it locally:
+```bash
+rm TangoDisplay-vX.Y.Z-universal.zip
+```
+
+---
+
 ## Done
 
 Report a summary:
