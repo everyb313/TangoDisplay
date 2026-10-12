@@ -4,6 +4,23 @@
         <title>TangoDisplay</title>
         <link>https://github.com/richardsladetdj-creator/TangoDisplay</link>
         <item>
+            <title>Version 4.0.0</title>
+            <pubDate>Mon, 12 Oct 2026 11:06:24 +0000</pubDate>
+            <sparkle:version>113</sparkle:version>
+            <sparkle:shortVersionString>4.0.0</sparkle:shortVersionString>
+            <description><![CDATA[
+                <ul>
+                    <li><b>Edit Tags:</b> right-click a setlist row and choose <b>Edit Tags…</b> to change the track's title, artist, genre, year, grouping, album artist and comment — written into the audio file itself, not a local override. A blank field removes that tag. The row and the dancer display update straight away, including the "Coming Up" preview, and a genre edit can turn a track into (or out of) a cortina. The save goes to a temporary copy that is swapped in only once complete, so a crash or full disk never leaves a half-written file, and a track that is playing keeps playing. For tracks dragged from Apple Music, the library's own file is updated too and Music is told to refresh it (this may launch Music). Supports MP3, M4A, AIFF, WAV, FLAC and Opus; greyed out for read-only files. Built-in player only.</li>
+                    <li><b>Rename reports:</b> click the pencil icon next to a saved setlist report in the Reports tab to rename it.</li>
+                </ul>
+            ]]></description>
+            <enclosure
+                url="https://github.com/richardsladetdj-creator/TangoDisplay/releases/download/v4.0.0/TangoDisplay-v4.0.0-universal.zip"
+                sparkle:edSignature="w4pQu7k/pGHZMwboxZVFlDqkM2xbBIfsqYspzuQ709KZf1Nd7gndxfFxqLnhb0OlYxTY8mRsz0uBgVCcKtybCQ=="
+                length="7936235"
+                type="application/zip"/>
+        </item>
+        <item>
             <title>Version 3.33.0</title>
             <pubDate>Wed, 23 Sep 2026 10:56:28 +0000</pubDate>
             <sparkle:version>112</sparkle:version>
