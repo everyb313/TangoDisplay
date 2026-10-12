@@ -32,10 +32,11 @@ struct SetlistEntry: Identifiable, Codable {
     var trimEndSeconds: Double? = nil      // nil = play to file end
     var restorationOverride: Bool? = nil   // nil = follow global rule; true = force skip; false = force apply
     var upcomingOverride: UpcomingOverride? = nil  // cortina only: DJ-edited "Coming Up" details for the next tanda
+    var musicPersistentID: String? = nil   // set for Music drags — lets Edit Tags reach the library original
     var autoGapApplied: Bool = false   // transient: true while auto-gap preroll is scheduled before this track
 
     enum CodingKeys: String, CodingKey {
-        case id, fileURL, track, state, duration, autoGapOverride, ignoresAutoFade, isLastTanda, isPerformance, repeatTrack, pluginConfigurationID, tagColor, trimStartSeconds, trimEndSeconds, restorationOverride, upcomingOverride
+        case id, fileURL, track, state, duration, autoGapOverride, ignoresAutoFade, isLastTanda, isPerformance, repeatTrack, pluginConfigurationID, tagColor, trimStartSeconds, trimEndSeconds, restorationOverride, upcomingOverride, musicPersistentID
         // autoGapApplied is intentionally excluded — reset each playback session
     }
 
@@ -84,6 +85,7 @@ struct SetlistEntry: Identifiable, Codable {
         trimEndSeconds = try c.decodeIfPresent(Double.self, forKey: .trimEndSeconds)
         restorationOverride = try c.decodeIfPresent(Bool.self, forKey: .restorationOverride)
         upcomingOverride = try c.decodeIfPresent(UpcomingOverride.self, forKey: .upcomingOverride)
+        musicPersistentID = try c.decodeIfPresent(String.self, forKey: .musicPersistentID)
         autoGapApplied = false
     }
 }
@@ -130,16 +132,18 @@ final class SetlistManager: ObservableObject {
         // inserting made drags look like they failed, prompting a re-drag that then
         // hit a spurious duplicate warning.
         let placeholders = audioURLs.map { url in
-            SetlistEntry(fileURL: url,
-                         track: Track(title: url.deletingPathExtension().lastPathComponent,
-                                      artist: "", genre: "", persistentID: url.path))
+            var e = SetlistEntry(fileURL: url,
+                                 track: Track(title: url.deletingPathExtension().lastPathComponent,
+                                              artist: "", genre: "", persistentID: url.path))
+            e.musicPersistentID = musicIDs.persistentID(for: url)
+            return e
         }
         insert(placeholders, before: anchorID)   // already calls save() + loadMissingDurations()
         for p in placeholders {
             let id = p.id, url = p.fileURL
             // Only tracks that came from a Music drag carry a persistent ID, and only they
             // get trim imported. Nothing here touches the main thread or Music itself.
-            let musicID = importMusicTimes ? musicIDs.persistentID(for: url) : nil
+            let musicID = importMusicTimes ? p.musicPersistentID : nil
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 let track = await SetlistManager.readMetadata(from: url)
@@ -371,22 +375,25 @@ final class SetlistManager: ObservableObject {
     /// returns nothing and that empty result is what gets saved. This is the retry.
     func reloadMetadata(ids: [UUID]) {
         for id in ids {
-            guard let idx = entries.firstIndex(where: { $0.id == id }) else { continue }
-            let url = entries[idx].fileURL
-            Task { @MainActor [weak self] in
-                guard let self else { return }
-                let track = await SetlistManager.readMetadata(from: url)
-                guard let i = self.entries.firstIndex(where: { $0.id == id }) else { return }
-                // A read off a still-sleeping volume comes back empty. Never let that
-                // overwrite tags the row already has — a failed retry should change nothing.
-                let old = self.entries[i].track
-                let readFoundNothing = track.artist.isEmpty && track.genre.isEmpty
-                let rowHasTags = !old.artist.isEmpty || !old.genre.isEmpty
-                guard !(readFoundNothing && rowHasTags) else { return }
-                self.entries[i].track = track
-                self.save()
-            }
+            Task { @MainActor [weak self] in await self?.reloadMetadata(id: id) }
         }
+    }
+
+    /// `force` skips the empty-read guard: straight after our own tag write the volume is
+    /// evidently awake, so an empty artist and genre is what the user asked for.
+    @MainActor
+    func reloadMetadata(id: UUID, force: Bool = false) async {
+        guard let url = entries.first(where: { $0.id == id })?.fileURL else { return }
+        let track = await SetlistManager.readMetadata(from: url)
+        guard let i = entries.firstIndex(where: { $0.id == id }) else { return }
+        // A read off a still-sleeping volume comes back empty. Never let that
+        // overwrite tags the row already has — a failed retry should change nothing.
+        let old = entries[i].track
+        let readFoundNothing = track.artist.isEmpty && track.genre.isEmpty
+        let rowHasTags = !old.artist.isEmpty || !old.genre.isEmpty
+        guard force || !(readFoundNothing && rowHasTags) else { return }
+        entries[i].track = track
+        save()
     }
 
     /// A row whose artist and genre are both empty never got a successful read — either the

@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "cxxtaglib",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sbooth/CXXTagLib",
+      "state" : {
+        "revision" : "9e499ea0a69d107791ac0a2fe9d6a59cf401c6f9",
+        "version" : "2.3.2"
+      }
+    },
+    {
       "identity" : "sparkle",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sparkle-project/Sparkle",

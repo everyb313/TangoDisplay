@@ -1957,6 +1957,13 @@ final class LocalPlayerSource: NSObject, ObservableObject, MusicPlayerSource {
         }
     }
 
+    /// Re-sends the current track and playlist — for when a row's tags change under the
+    /// player (Edit Tags), since nothing here observes `setlist.entries`.
+    func refreshReports() {
+        reportCurrentState()
+        reportPlaylist()
+    }
+
     // MARK: - Private: state reporting
 
     private func reportCurrentState() {

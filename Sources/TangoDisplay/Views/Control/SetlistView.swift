@@ -545,6 +545,7 @@ struct SetlistView: View {
     @State private var showLastTandaWarning = false
     @State private var pendingRepeatID: UUID?
     @State private var editingUpcoming: SetlistEntry?
+    @State private var editingTags: SetlistEntry?
     @State private var pasteMonitor: Any? = nil
     @State private var hogConflictWarning = false
     @State private var hogDeviceStolenAlertShown = false
@@ -881,6 +882,9 @@ struct SetlistView: View {
         }
         .sheet(item: $editingUpcoming) { entry in
             UpcomingInfoEditor(entry: entry)
+        }
+        .sheet(item: $editingTags) { entry in
+            TagEditorSheet(entry: entry)
         }
     }
 
@@ -1275,6 +1279,10 @@ struct SetlistView: View {
         Divider()
         Button(targets.count == 1 ? "Reload Track Info" : "Reload Track Info for Selection") {
             setlist.reloadMetadata(ids: Array(targets))
+        }
+        if targets.count == 1, let e = setlist.entries.first(where: { targets.contains($0.id) }) {
+            Button("Edit Tags…") { editingTags = e }
+                .disabled(!TagEditor.canWrite(e.fileURL))
         }
         Divider()
         let singleEntry = targets.count == 1 ? setlist.entries.first(where: { targets.contains($0.id) }) : nil
