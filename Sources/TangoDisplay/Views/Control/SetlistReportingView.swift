@@ -12,6 +12,8 @@ struct SetlistReportingView: View {
     @State private var showBulkDeleteConfirmation = false
     @State private var errorMessage: String? = nil
     @State private var showError = false
+    @State private var renaming: SetlistReportMetadata? = nil
+    @State private var renameText = ""
 
     private var selectedCount: Int { selectedIDs.count }
 
@@ -70,6 +72,24 @@ struct SetlistReportingView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("The selected setlist exports will be permanently removed.")
+        }
+        .alert("Rename Report", isPresented: Binding(
+            get: { renaming != nil },
+            set: { if !$0 { renaming = nil } }
+        )) {
+            TextField("Report name", text: $renameText)
+            Button("Rename") {
+                let name = renameText.trimmingCharacters(in: .whitespaces)
+                guard !name.isEmpty, let item = renaming else { return }
+                renaming = nil
+                do {
+                    try reportStore.rename(item, to: name)
+                } catch {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                }
+            }
+            Button("Cancel", role: .cancel) { renaming = nil }
         }
         .alert("Report Error", isPresented: $showError) {
             Button("OK", role: .cancel) {}
@@ -217,6 +237,18 @@ struct SetlistReportingView: View {
                 .padding(.vertical, 3)
                 .background(Color.secondary.opacity(0.12))
                 .clipShape(Capsule())
+
+            Button {
+                renameText = metadata.name
+                renaming = metadata
+            } label: {
+                Image(systemName: "pencil")
+                    .font(.system(size: 12))
+                    .foregroundColor(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help("Rename this setlist export")
+            .padding(.leading, 4)
 
             Button {
                 pendingDelete = metadata

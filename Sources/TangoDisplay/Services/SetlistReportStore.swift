@@ -61,6 +61,16 @@ final class SetlistReportStore: ObservableObject {
         refresh()
     }
 
+    func rename(_ metadata: SetlistReportMetadata, to newName: String) throws {
+        let old = try load(metadata)
+        try save(SetlistReport(id: old.id, name: newName, exportDate: old.exportDate, entries: old.entries))
+        // Filename embeds sanitized name; same sanitized name means save() overwrote the original file.
+        if sanitizeName(newName) != sanitizeName(old.name) {
+            try FileManager.default.removeItem(at: metadata.fileURL)
+            refresh()
+        }
+    }
+
     func load(_ metadata: SetlistReportMetadata) throws -> SetlistReport {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601

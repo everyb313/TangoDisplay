@@ -163,6 +163,7 @@ Right-click any row:
 | **Mark as Performance** | Marks this track as a guest performance track. When it plays, the dancer display switches to the custom Performance view instead of normal track info. Shows as **Remove Performance** when already set. See [Performance Tracks](#performance-tracks) below. |
 | **Tag Colour** | Opens a sub-menu to assign a colour dot (red, orange, yellow, green, blue, purple) to the row for visual organisation, or **Clear Tag Colour** to remove it. See [Track Tags](#track-tags) below. |
 | **Reload Track Info** | Re-reads the artist, title, genre, year and other tags from the file. Use it when a row shows a filename instead of proper track details — see [Tracks Showing Filenames](#tracks-showing-filenames) below. Select several rows first and the action becomes **Reload Track Info for Selection**. |
+| **Edit Tags…** | Opens an editor for the track's tags — title, artist, genre, year, grouping, album artist and comment — and writes them into the audio file itself. Single row only; greyed out for formats it can't write or read-only files. See [Edit Tags](#edit-tags) below. Built-in player only. |
 
 > **Screenshot placeholder:** right-click context menu on a setlist row
 
@@ -359,6 +360,41 @@ A pencil icon appears on the row while an override is set. To remove it later, r
 - Editing the cortina that is **already playing** updates the dancer display immediately.
 - The override is saved with the setlist and survives restarts. It belongs to that one cortina row; other cortinas are unaffected.
 - Built-in player only — external players have no per-entry setlist metadata.
+
+---
+
+## Edit Tags
+
+Fix a track's tags without leaving TangoDisplay. Unlike [Edit Upcoming Info](#edit-upcoming-info), this is not an override stored with the setlist — it rewrites the tags in the audio file, so every app that reads the file sees the change.
+
+### Editing
+
+Right-click a setlist row and select **Edit Tags…**. The editor shows the current values for:
+
+| Field | Notes |
+|---|---|
+| **Title** | |
+| **Artist** | |
+| **Genre** | Decides whether the track counts as a cortina — see below |
+| **Year** | |
+| **Grouping** | |
+| **Album Artist** | |
+| **Comment** | |
+
+Change any field and click **Save**. Only fields you changed are written. Clearing a field removes that tag from the file.
+
+### What Happens on Save
+
+- The row is re-read from the file, and the dancer display updates straight away if the track is playing now or is the next tanda's first track (the "Coming Up" preview).
+- **Genre affects cortina status.** Changing the genre can turn a dance track into a cortina or the reverse, which changes tanda grouping and the Coming Up preview.
+- The new tags are written to a temporary copy beside the file, which replaces the original only once complete. A crash or full disk never leaves a half-written file, and a track that is **currently playing keeps playing**.
+- **Tracks dragged from Apple Music:** the setlist plays a copy, so TangoDisplay also writes the tags to the file in your Music library and tells Music to refresh the track. This may launch Music if it isn't running. If the track can't be found in Music, the setlist copy is still saved and a warning explains that the library file is unchanged.
+
+### Supported Files
+
+MP3, M4A, AIFF, WAV, FLAC and Opus. **Edit Tags…** is greyed out for other formats (e.g. CAF) and for files or folders you don't have write permission for.
+
+Built-in player only.
 
 ---
 
@@ -954,4 +990,5 @@ Select one or more reports in the list, then click **Generate HTML Report**. Tan
 ### Managing reports
 
 - **Select multiple** — ⌘-click or use the checkboxes to select several reports before generating a combined export.
+- **Rename** — click the pencil icon next to a report, type the new name and click **Rename**.
 - **Delete** — select one or more reports and click **Delete**. A confirmation prompt appears before anything is removed.
